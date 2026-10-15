@@ -1,0 +1,460 @@
+'use client';
+// 이 파일은 tools/convert-design.mjs 가 design/Serve.dc.html 에서 자동으로 만든 파일이에요.
+// 화면을 고치려면 design 파일을 고친 뒤 `npm run convert` 를 다시 돌리세요.
+import React, { useEffect } from 'react';
+import { A, DCLogic, asset, css, useDC } from '@/lib/dc';
+
+const STYLE = "\nbody{margin:0;background:#F6F9F1}\na{color:#2F5E17}a:hover{color:#1F3B16}\n.nav-burger{display:none !important}\n.util-bar,.site-header{width:100%;max-width:1280px;margin-left:auto !important;margin-right:auto !important;box-sizing:border-box}\nheader{flex-wrap:nowrap !important}\n.nav-links{white-space:nowrap;flex-shrink:0}\n@media (max-width: 1320px){.nav-links{gap:20px !important;font-size:16px !important}}\n@media (max-width: 1100px){.nav-links{gap:14px !important;font-size:15px !important}}\n.nav-dropdown{visibility:hidden;opacity:0;clip-path:inset(0 -40px 100% -40px);transition:clip-path .35s cubic-bezier(.2,.7,.2,1),opacity .2s ease,visibility 0s linear .35s}\n.nav-dropdown a{opacity:0;transform:translateY(-6px);transition:opacity .25s ease,transform .25s ease,background .15s}\n.nav-item:hover .nav-dropdown,.nav-item:focus-within .nav-dropdown{visibility:visible;opacity:1;clip-path:inset(0 -40px -60px -40px);transition:clip-path .35s cubic-bezier(.2,.7,.2,1),opacity .2s ease,visibility 0s}\n.nav-item:hover .nav-dropdown a,.nav-item:focus-within .nav-dropdown a{opacity:1;transform:none}\n.nav-item:hover .nav-dropdown a:nth-child(2){transition-delay:.04s}\n.nav-item:hover .nav-dropdown a:nth-child(3){transition-delay:.08s}\n.nav-item:hover .nav-dropdown a:nth-child(4){transition-delay:.12s}\n.nav-item:hover .nav-dropdown a:nth-child(5){transition-delay:.16s}\n.sub-list{max-height:0;overflow:hidden;opacity:0;transition:max-height .35s cubic-bezier(.2,.7,.2,1),opacity .25s ease,margin .35s}\n.sub-group.open .sub-list,.sub-group:focus-within .sub-list{max-height:260px;opacity:1;margin-top:2px !important;margin-bottom:6px !important}\n.sub-group.open .sub-caret,.sub-group:focus-within .sub-caret{transform:rotate(180deg)}\n.sub-group.open > a{background:#EEF6E3;color:#1F3B16}\n.sub-list a:hover{background:#DCEEC6 !important}\n.nav-item:hover .nav-caret{transform:rotate(180deg)}\n.nav-dropdown a:hover{background:#EEF6E3;color:#1F3B16}\n.person-card img{transition:transform .4s ease}\n.person-card:hover img{transform:scale(1.04)}\n@media (prefers-reduced-motion: reduce){.nav-dropdown,.nav-dropdown a,.sub-list,.person-card img{transition:none !important}}\n@media (max-width: 860px){\n  .nav-links{display:none !important}\n  .nav-burger{display:flex !important}\n  .page-title{font-size:34px !important}\n}\n";
+
+class Component extends DCLogic {
+  renderVals() {
+    const openSub = this.state ? this.state.openSub : null;
+    const B = '/_blob/';
+    const adult = [
+      ['d7af3bbec5f1dad50897ab01d5756f52', '홍종규', '집사', '마사이 목장'],
+      ['5c548570b558147e47a3c7f3a6828b09', '이지훈', '집사', '안수집사 · 말레이 목장'],
+      ['0580d52768968767b6249b917d7a1ea8', '이재천', '집사', '멕시코 목장'],
+      ['b2b4c93806e1e08cd7356451d1d996c0', '박용상', '집사', '미송게니 목장'],
+      ['5ebfc04f7bce98c5322eec1f6429543c', '손호남', '집사', '모로고로 목장'],
+      ['9d10e1291bf444eda4e087a1b8bdafb9', '이호을', '집사', '바카무나 목장'],
+      ['54b998f60cf19d3b81bff5e70825562c', '송호종', '집사', '안수집사 · 스리랑카 목장'],
+      ['1eaf874d0174ac4c21a59dfb549aa13d', '송승구', '집사', '안수집사 · 위촐 목장'],
+      ['3a5053a397211b43eb1bc3e600a8e701', '홍두진', '집사', '청원 목장'],
+      ['6fe6f9886464a812f633d07cc228911a', '박유식', '장로', '시무장로 · 키징가 목장'],
+      ['90dceabd6aae2980c07bb8ca84ac1159', '김선배', '집사', '안수집사 · 킬로카 목장'],
+      ['b5df98bb9c9ae3f24217ce97289e0871', '문해강', '집사', '안수집사 · 팡가웨 목장'],
+      ['27808fb66620198b5494bd1056bfa771', '서광운', '집사', '안수집사 · 싸포판 목장'],
+      ['a1b7526b8aa3ae07972b29c4a4fc8b5a', '김수현', '집사', '탄자니아 초원'],
+      ['a03727613f5d6ff1579e24e9f3b3e090', '이종대', '집사', 'GST 목장'],
+      ['e1aaf01b54a63ca671d0300eb5efd326', '조민구', '집사', '또날라 목장'],
+      ['b5c82cbe925bcf657ce2838a4d1c80c9', '이성한', '집사', '응게레 목장'],
+      ['e612e968f74e81ea2b1600b6abf46c42', '윤산', '형제', '할리스코 목장'],
+      ['7ae808b9f62ce46d573ca9a97146d0c5', '원호연', '형제', '과달라 목장'],
+      ['f0fcbfea81f3717f5442e88ffd7ee54c', '신주희', '자매', '챠팔라 목장']
+    ];
+    const young = [
+      ['a1b7526b8aa3ae07972b29c4a4fc8b5a', '김수현', '집사', '담당 사역자, 공동체 초원장'],
+      ['3cb44e8935be739697a4729f83295931', '이하람', '목동', '은도토 목장'],
+      ['eb47dc239639977c9ccd88a2452390d3', '김예은', '목동', '카니사 목장'],
+      ['d1296104904aa4c01cd08213869e1c2e', '이승아', '목동', '우펜도 목장']
+    ];
+    const youth = [
+      ['0a5d4c56f70f2b402bf914f41a14d916', '윤상혁', '디렉터', '주일예배 영어권 설교, 중고등부(인디오 목장)'],
+      ['4246cac6fdab43c1573dbe2b17e256bf', '임수지', '집사', '중고등부(인디오 목장) 디렉터 & 교사'],
+      ['e612e968f74e81ea2b1600b6abf46c42', '윤산', '형제', '중고등부(인디오 목장) 디렉터 & 교사'],
+      ['6bcbb1785ef1e1c53014ab2a5244756c', '유재엽', '형제', '중고등부(인디오 목장) 디렉터 & 교사']
+    ];
+    const kids = [
+      ['51ad616bde4f34c956a1aac2f8f7be2d', '유선영', '사모', '주일학교 & 한글학교 디렉터'],
+      ['d14faa4cb30b4bae070b70648eb27efc', '김보현', '집사', '주일학교 교사'],
+      ['0c97cb71929c5570d7cb076f8d3dfeb1', '나지연', '집사', '주일학교 교사'],
+      ['7394edbe039cd935ca03716e0048756c', '이지희', '자매', '주일학교 교사']
+    ];
+    const toPeople = (list) => list.map((r) => ({ img: B + r[0], name: r[1], title: r[2], role: r[3], alt: r[1] + ' ' + r[2] }));
+    const groups = [
+      { id: 'adult', eyebrow: 'ADULT SMALL GROUPS', title: '장년목장 공동체', people: toPeople(adult) },
+      { id: 'young', eyebrow: 'COLLEGE & YOUNG ADULTS', title: '대학청년 공동체', people: toPeople(young) },
+      { id: 'youth', eyebrow: 'YOUTH', title: '중고등부 공동체', people: toPeople(youth) },
+      { id: 'kids', eyebrow: 'SUNDAY SCHOOL', title: '주일학교 공동체', people: toPeople(kids) }
+    ].map((g) => ({ ...g, count: g.people.length }));
+    return {
+      primary: this.props.primary ?? '#8BC34A',
+      groups,
+      aboutCls: openSub === 'about' ? 'open' : '',
+      openAbout: () => { if (openSub !== 'about') this.setState({ openSub: 'about' }); },
+      closeSub: () => { if (openSub !== null) this.setState({ openSub: null }); }
+    };
+  }
+}
+
+export default function Page() {
+  const v = useDC(Component);
+  useEffect(() => { document.title = "섬기는 분들"; }, []);
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: STYLE }} />
+      <div style={css("font-family: 'IBM Plex Sans KR', system-ui, sans-serif; color: #1B2516; background: #F6F9F1; min-height: 100vh; word-break: keep-all")}>
+        <section style={css("position: relative; color: #FFFFFF; background: #1F3B16")}>
+          <img src={asset("/_blob/571fca60c66213ece3685d84d1b4dc9d")} alt="" style={css("position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 30%")} />
+          <div style={css("position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,38,14,0.88) 0%, rgba(20,38,14,0.72) 100%)")} />
+          <div className="util-bar" style={css("position: relative; display: flex; justify-content: flex-end; gap: 20px; padding: 14px 40px 0; font-size: 13px")}>
+            <A href="Main.dc.html" style={css("color: rgba(255,255,255,0.9); text-decoration: none")}>
+              {"홈"}
+            </A>
+            <A href="Login.dc.html" style={css("color: rgba(255,255,255,0.9); text-decoration: none")}>
+              {"로그인"}
+            </A>
+            <A href="Signup.dc.html" style={css("color: rgba(255,255,255,0.9); text-decoration: none")}>
+              {"회원가입"}
+            </A>
+          </div>
+          <header className="site-header" style={css("position: relative; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px 0; flex-wrap: wrap")}>
+            <A href="Main.dc.html" style={css("display: flex; align-items: center; gap: 12px; text-decoration: none; color: #FFFFFF")}>
+              <span style={css("display: flex; flex-direction: column; align-items: flex-start; gap: 5px")}>
+                <img src={asset("/_blob/122f04b2c3721aa4a0194f5dc7c5de6e")} alt="예수원교회" style={css("height: 40px; width: auto; display: block")} />
+                <span style={css("font-size: 11px; letter-spacing: 0.04em; opacity: 0.85")}>
+                  {"Jesuwon Community Church (ARPC)"}
+                </span>
+              </span>
+            </A>
+            <nav className="nav-links" aria-label="주 메뉴" style={css("display: flex; gap: 36px; font-size: 17px; font-weight: 500")}>
+              <div className="nav-item" style={css("position: relative")} onMouseLeave={v.closeSub}>
+                <A href="#" aria-current="page" aria-haspopup="true" style={css(`display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0; box-shadow: inset 0 -3px 0 ${v.primary ?? ""}`)}>
+                  {" 교회안내 "}
+                  <svg className="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={css("transition: transform 0.2s")}>
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </A>
+                <div className="nav-dropdown" style={css("position: absolute; left: -12px; top: 100%; padding-top: 10px; z-index: 20")}>
+                  <div style={css(`width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid ${v.primary ?? ""}`)}>
+                    <div className={`sub-group ${v.aboutCls ?? ""}`} onMouseEnter={v.openAbout}>
+                      <A href="About.dc.html" aria-haspopup="true" style={css("display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                        {" 예수원교회는 "}
+                        <svg className="sub-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={css("transition: transform 0.25s")}>
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </A>
+                      <div className="sub-list" style={css("background: #EEF6E3; border-radius: 10px; margin: 0 4px")}>
+                        <A href="About.dc.html" style={css("display: block; padding: 10px 14px 10px 26px; border-radius: 8px; color: #2F5E17; text-decoration: none; font-size: 14px; font-weight: 500")}>
+                          {"예수원 소개"}
+                        </A>
+                        <A href="About.dc.html" style={css("display: block; padding: 10px 14px 10px 26px; border-radius: 8px; color: #2F5E17; text-decoration: none; font-size: 14px; font-weight: 500")}>
+                          {"목회관 & 구조"}
+                        </A>
+                        <A href="About.dc.html" style={css("display: block; padding: 10px 14px 10px 26px; border-radius: 8px; color: #2F5E17; text-decoration: none; font-size: 14px; font-weight: 500")}>
+                          {"2세를 향한 비전"}
+                        </A>
+                        <A href="About.dc.html" style={css("display: block; padding: 10px 14px 10px 26px; border-radius: 8px; color: #2F5E17; text-decoration: none; font-size: 14px; font-weight: 500")}>
+                          {"예수원의 신앙고백"}
+                        </A>
+                      </div>
+                    </div>
+                    <A href="#" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"예배 안내"}
+                    </A>
+                    <A href="Serve.dc.html" aria-current="page" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1F3B16; background: #EEF6E3; text-decoration: none; font-size: 15px; font-weight: 600")}>
+                      {"섬기는 분들"}
+                    </A>
+                    <A href="Main.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"찾아오시는 길"}
+                    </A>
+                  </div>
+                </div>
+              </div>
+              <div className="nav-item" style={css("position: relative")}>
+                <A href="#" aria-haspopup="true" style={css("display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0")}>
+                  {" 예배와 말씀 "}
+                  <svg className="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={css("transition: transform 0.2s")}>
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </A>
+                <div className="nav-dropdown" style={css("position: absolute; left: -12px; top: 100%; padding-top: 10px; z-index: 20")}>
+                  <div style={css(`width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid ${v.primary ?? ""}`)}>
+                    <A href="Words.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"영상칼럼"}
+                    </A>
+                    <A href="Words.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"교리강좌"}
+                    </A>
+                  </div>
+                </div>
+              </div>
+              <div className="nav-item" style={css("position: relative")}>
+                <A href="#" aria-haspopup="true" style={css("display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0")}>
+                  {" 목장 "}
+                  <svg className="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={css("transition: transform 0.2s")}>
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </A>
+                <div className="nav-dropdown" style={css("position: absolute; left: -12px; top: 100%; padding-top: 10px; z-index: 20")}>
+                  <div style={css(`width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid ${v.primary ?? ""}`)}>
+                    <A href="Mokjang.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"장년목장"}
+                    </A>
+                    <A href="Mokjang.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"탄자니아초원"}
+                    </A>
+                    <A href="Mokjang.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"인디오초원"}
+                    </A>
+                    <A href="Mokjang.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"주일학교"}
+                    </A>
+                  </div>
+                </div>
+              </div>
+              <div className="nav-item" style={css("position: relative")}>
+                <A href="#" aria-haspopup="true" style={css("display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0")}>
+                  {" Ufeedem "}
+                  <svg className="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={css("transition: transform 0.2s")}>
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </A>
+                <div className="nav-dropdown" style={css("position: absolute; left: -12px; top: 100%; padding-top: 10px; z-index: 20")}>
+                  <div style={css(`width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid ${v.primary ?? ""}`)}>
+                    <A href="Ufeedem.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"선교지 소식"}
+                    </A>
+                    <A href="Ufeedem.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"사랑의 나눔"}
+                    </A>
+                    <A href="Ufeedem.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"GST 신학교"}
+                    </A>
+                  </div>
+                </div>
+              </div>
+              <div className="nav-item" style={css("position: relative")}>
+                <A href="#" aria-haspopup="true" style={css("display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0")}>
+                  {" 쉴만한 물가 "}
+                  <svg className="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={css("transition: transform 0.2s")}>
+                    <path d="M6 9l6 6 6-6" />
+                  </svg>
+                </A>
+                <div className="nav-dropdown" style={css("position: absolute; right: 0; top: 100%; padding-top: 10px; z-index: 20")}>
+                  <div style={css(`width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid ${v.primary ?? ""}`)}>
+                    <A href="Rest.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"사진 앨범"}
+                    </A>
+                    <A href="Rest.dc.html" style={css("display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500")}>
+                      {"교회소식"}
+                    </A>
+                  </div>
+                </div>
+              </div>
+            </nav>
+            <button className="nav-burger" aria-label="메뉴 열기" style={css("width: 44px; height: 44px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.5); background: transparent; color: #FFFFFF; align-items: center; justify-content: center; cursor: pointer")}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <path d="M4 7h16" />
+                <path d="M4 12h16" />
+                <path d="M4 17h16" />
+              </svg>
+            </button>
+          </header>
+          <div style={css("position: relative; max-width: 1200px; margin: 0 auto; padding: 72px 40px 64px; box-sizing: border-box")}>
+            <p style={css(`margin: 0 0 12px; font-size: 14px; letter-spacing: 0.14em; color: ${v.primary ?? ""}; font-weight: 700`)}>
+              {"OUR SERVANTS"}
+            </p>
+            <h1 className="page-title" style={css("margin: 0; font-family: 'Gowun Batang', serif; font-size: 48px; font-weight: 700")}>
+              {"섬기는 분들"}
+            </h1>
+            <nav aria-label="현재 위치" style={css("display: flex; align-items: center; gap: 10px; margin-top: 18px; font-size: 14px; color: rgba(255,255,255,0.8)")}>
+              <A href="Main.dc.html" style={css("color: rgba(255,255,255,0.85); text-decoration: none")}>
+                {"홈"}
+              </A>
+              <span aria-hidden="true">
+                {"›"}
+              </span>
+              <span>
+                {"교회안내"}
+              </span>
+              <span aria-hidden="true">
+                {"›"}
+              </span>
+              <span style={css("color: #FFFFFF; font-weight: 600")}>
+                {"섬기는 분들"}
+              </span>
+            </nav>
+          </div>
+        </section>
+        <main style={css("max-width: 1200px; margin: 0 auto; padding: 72px 40px 96px; box-sizing: border-box")}>
+          <nav aria-label="공동체 바로가기" style={css("display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 56px")}>
+            <A href="#church" style={css("display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: #1F3B16; color: #FFFFFF; text-decoration: none; font-size: 15px; font-weight: 600")}>
+              {"교회 공동체"}
+            </A>
+            <A href="#adult" style={css("display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: #FFFFFF; border: 1px solid #D3DCC6; color: #1B2516; text-decoration: none; font-size: 15px")}>
+              {"장년목장 공동체"}
+            </A>
+            <A href="#young" style={css("display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: #FFFFFF; border: 1px solid #D3DCC6; color: #1B2516; text-decoration: none; font-size: 15px")}>
+              {"대학청년 공동체"}
+            </A>
+            <A href="#youth" style={css("display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: #FFFFFF; border: 1px solid #D3DCC6; color: #1B2516; text-decoration: none; font-size: 15px")}>
+              {"중고등부 공동체"}
+            </A>
+            <A href="#kids" style={css("display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: #FFFFFF; border: 1px solid #D3DCC6; color: #1B2516; text-decoration: none; font-size: 15px")}>
+              {"주일학교 공동체"}
+            </A>
+          </nav>
+          <section id="church" style={css("margin-bottom: 80px; scroll-margin-top: 24px")}>
+            <p style={css("margin: 0 0 8px; font-size: 13px; letter-spacing: 0.14em; color: #3F7A1C; font-weight: 700")}>
+              {"CHURCH"}
+            </p>
+            <h2 style={css("margin: 0 0 28px; font-family: 'Gowun Batang', serif; font-size: 30px; font-weight: 700")}>
+              {"교회 공동체"}
+            </h2>
+            <div style={css("display: flex; gap: 32px; flex-wrap: wrap; background: #FFFFFF; border: 1px solid #E1E8D6; border-radius: 24px; padding: 32px; margin-bottom: 20px")}>
+              <div style={css("flex: 0 0 260px; max-width: 100%; aspect-ratio: 3 / 4; border-radius: 16px; overflow: hidden; background: #DDE7D0")}>
+                <img src={asset("/_blob/3ac2cef27d552c0c481c6366c94a5e4f")} alt="윤성종 목사" style={css("width: 100%; height: 100%; object-fit: cover; display: block")} />
+              </div>
+              <div style={css("flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; justify-content: center")}>
+                <span style={css(`align-self: flex-start; font-size: 13px; font-weight: 700; color: #1B2516; background: ${v.primary ?? ""}; padding: 5px 12px; border-radius: 999px`)}>
+                  {"담임목사"}
+                </span>
+                <h3 style={css("margin: 14px 0 0; font-family: 'Gowun Batang', serif; font-size: 34px; font-weight: 700")}>
+                  {"윤성종 "}
+                  <span style={css("font-size: 22px; color: #56634F")}>
+                    {"목사"}
+                  </span>
+                </h3>
+                <div style={css("display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px; font-size: 15px")}>
+                  <A href="tel:4846861232" style={css("display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 6px 0")}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1z" />
+                    </svg>
+                    {" 484-686-1232 "}
+                  </A>
+                  <A href="mailto:jesuwon@hotmail.com" style={css("display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 6px 0")}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <rect x="3" y="5" width="18" height="14" rx="2" />
+                      <path d="M3 7l9 6 9-6" />
+                    </svg>
+                    {" jesuwon@hotmail.com "}
+                  </A>
+                </div>
+                <ul style={css("margin: 20px 0 0; padding: 20px 0 0; border-top: 1px solid #EDF1E6; list-style: none; display: flex; flex-direction: column; gap: 12px")}>
+                  <li style={css("display: flex; gap: 12px; font-size: 15px; line-height: 1.6")}>
+                    <span style={css(`flex-shrink: 0; width: 8px; height: 8px; margin-top: 8px; border-radius: 999px; background: ${v.primary ?? ""}`)} />
+                    <span>
+                      <b>
+                        {"목회학 석사 (MDiv)"}
+                      </b>
+                      <br />
+                      <span style={css("color: #56634F")}>
+                        {"비블리칼 신학대학원 (Biblical Seminary, Hatfield, PA)"}
+                      </span>
+                    </span>
+                  </li>
+                  <li style={css("display: flex; gap: 12px; font-size: 15px; line-height: 1.6")}>
+                    <span style={css(`flex-shrink: 0; width: 8px; height: 8px; margin-top: 8px; border-radius: 999px; background: ${v.primary ?? ""}`)} />
+                    <span>
+                      <b>
+                        {"신학 석사 (ThM in NT)"}
+                      </b>
+                      <br />
+                      <span style={css("color: #56634F")}>
+                        {"칼빈 신학대학원 (Calvin Theological Seminary, Grand Rapids, MI)"}
+                      </span>
+                    </span>
+                  </li>
+                  <li style={css("display: flex; gap: 12px; font-size: 15px; line-height: 1.6")}>
+                    <span style={css(`flex-shrink: 0; width: 8px; height: 8px; margin-top: 8px; border-radius: 999px; background: ${v.primary ?? ""}`)} />
+                    <span>
+                      <b>
+                        {"박사 과정 수학 (PhD in NT)"}
+                      </b>
+                      <br />
+                      <span style={css("color: #56634F")}>
+                        {"프레토리아 대학교 (The University of Pretoria, RSA)"}
+                      </span>
+                    </span>
+                  </li>
+                  <li style={css("display: flex; gap: 12px; font-size: 15px; line-height: 1.6")}>
+                    <span style={css(`flex-shrink: 0; width: 8px; height: 8px; margin-top: 8px; border-radius: 999px; background: ${v.primary ?? ""}`)} />
+                    <span>
+                      <b>
+                        {"목회학 박사 (DMin)"}
+                      </b>
+                      <br />
+                      <span style={css("color: #56634F")}>
+                        {"골든게이트 신학대학원 (Golden Gate Seminary, Mill Valley, CA)"}
+                      </span>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div style={css("display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px")}>
+              <div style={css("display: flex; gap: 20px; align-items: center; background: #FFFFFF; border: 1px solid #E1E8D6; border-radius: 20px; padding: 20px")}>
+                <div style={css("flex: 0 0 120px; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden; background: #DDE7D0")}>
+                  <img src={asset("/_blob/3064ccabb0ac64f09ed8c50c21ea72bd")} alt="손석진 목사" style={css("width: 100%; height: 100%; object-fit: cover; display: block")} />
+                </div>
+                <div style={css("min-width: 0")}>
+                  <span style={css("font-size: 13px; font-weight: 700; color: #3F7A1C")}>
+                    {"목회 행정"}
+                  </span>
+                  <h3 style={css("margin: 4px 0 0; font-family: 'Gowun Batang', serif; font-size: 26px; font-weight: 700")}>
+                    {"손석진 "}
+                    <span style={css("font-size: 18px; color: #56634F")}>
+                      {"목사"}
+                    </span>
+                  </h3>
+                  <A href="tel:4803002500" style={css("display: inline-block; margin-top: 8px; font-size: 15px; text-decoration: none; padding: 4px 0")}>
+                    {"480-300-2500"}
+                  </A>
+                </div>
+              </div>
+              <div style={css("display: flex; gap: 20px; align-items: center; background: #FFFFFF; border: 1px solid #E1E8D6; border-radius: 20px; padding: 20px")}>
+                <div style={css("flex: 0 0 120px; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden; background: #DDE7D0")}>
+                  <img src={asset("/_blob/51ad616bde4f34c956a1aac2f8f7be2d")} alt="유선영 사모" style={css("width: 100%; height: 100%; object-fit: cover; display: block")} />
+                </div>
+                <div style={css("min-width: 0")}>
+                  <span style={css("font-size: 13px; font-weight: 700; color: #3F7A1C")}>
+                    {"주일학교 & 한글학교 디렉터"}
+                  </span>
+                  <h3 style={css("margin: 4px 0 0; font-family: 'Gowun Batang', serif; font-size: 26px; font-weight: 700")}>
+                    {"유선영 "}
+                    <span style={css("font-size: 18px; color: #56634F")}>
+                      {"사모"}
+                    </span>
+                  </h3>
+                  <A href="tel:4846861233" style={css("display: inline-block; margin-top: 8px; font-size: 15px; text-decoration: none; padding: 4px 0")}>
+                    {"484-686-1233"}
+                  </A>
+                </div>
+              </div>
+            </div>
+          </section>
+          {(v.groups || []).map((g, _i0) => (
+            <React.Fragment key={_i0}>
+              <section id={g.id} style={css("margin-bottom: 80px; scroll-margin-top: 24px")}>
+                <p style={css("margin: 0 0 8px; font-size: 13px; letter-spacing: 0.14em; color: #3F7A1C; font-weight: 700")}>
+                  {g.eyebrow}
+                </p>
+                <h2 style={css("margin: 0 0 28px; font-family: 'Gowun Batang', serif; font-size: 30px; font-weight: 700")}>
+                  {g.title}
+                </h2>
+                <div style={css("display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px")}>
+                  {(g.people || []).map((p, _i1) => (
+                    <React.Fragment key={_i1}>
+                      <div className="person-card" style={css("background: #FFFFFF; border: 1px solid #E1E8D6; border-radius: 18px; overflow: hidden")}>
+                        <div style={css("aspect-ratio: 3 / 4; overflow: hidden; background: #DDE7D0")}>
+                          <img src={asset(p.img)} alt={p.alt} style={css("width: 100%; height: 100%; object-fit: cover; display: block")} />
+                        </div>
+                        <div style={css("padding: 16px 18px 20px")}>
+                          <h3 style={css("margin: 0; font-size: 19px; font-weight: 700")}>
+                            {p.name}{" "}
+                            <span style={css("font-size: 15px; font-weight: 500; color: #56634F")}>
+                              {p.title}
+                            </span>
+                          </h3>
+                          <p style={css("margin: 6px 0 0; font-size: 14px; line-height: 1.6; color: #2F5E17")}>
+                            {p.role}
+                          </p>
+                        </div>
+                      </div>
+                    </React.Fragment>
+                  ))}
+                </div>
+              </section>
+            </React.Fragment>
+          ))}
+        </main>
+        <footer style={css("background: #16220F; color: rgba(255,255,255,0.8); padding: 56px 40px 40px")}>
+          <div style={css("max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 10px")}>
+            <img src={asset("/_blob/122f04b2c3721aa4a0194f5dc7c5de6e")} alt="예수원교회" style={css("height: 34px; width: auto; align-self: flex-start; display: block")} />
+            <span style={css("font-size: 14px; line-height: 1.8")}>
+              {"Jesuwon Community Church in Philadelphia"}
+              <br />
+              {"220 Upland Avenue Horsham, PA 19044"}
+              <br />
+              {"Tel. 484-686-1232 · Email. jesuwonch@gmail.com"}
+            </span>
+          </div>
+          <div style={css("max-width: 1200px; margin: 32px auto 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 13px; color: rgba(255,255,255,0.6)")}>
+            {"Copyright © 2023- 예수원교회. All rights reserved."}
+          </div>
+        </footer>
+      </div>
+    </>
+  );
+}

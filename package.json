@@ -5,11 +5,15 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "npx serve out",
+    "convert": "node tools/convert-design.mjs"
   },
   "dependencies": {
+    "next": "15.5.4",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "next": "15.5.4"
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "htmlparser2": "^9.1.0"
   }
 }

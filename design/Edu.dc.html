@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>예수원 새가족반</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&amp;family=IBM+Plex+Sans+KR:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F6F9F1}
+a{color:#2F5E17}a:hover{color:#1F3B16}
+.nav-burger{display:none !important}
+.util-bar,.site-header{width:100%;max-width:1280px;margin-left:auto !important;margin-right:auto !important;box-sizing:border-box}
+header{flex-wrap:nowrap !important}
+.nav-links{white-space:nowrap;flex-shrink:0}
+@media (max-width: 1320px){.nav-links{gap:20px !important;font-size:16px !important}}
+@media (max-width: 1100px){.nav-links{gap:14px !important;font-size:15px !important}}
+.nav-dropdown{visibility:hidden;opacity:0;clip-path:inset(0 -40px 100% -40px);transition:clip-path .35s cubic-bezier(.2,.7,.2,1),opacity .2s ease,visibility 0s linear .35s}
+.nav-dropdown a{opacity:0;transform:translateY(-6px);transition:opacity .25s ease,transform .25s ease,background .15s}
+.nav-item:hover .nav-dropdown,.nav-item:focus-within .nav-dropdown{visibility:visible;opacity:1;clip-path:inset(0 -40px -60px -40px);transition:clip-path .35s cubic-bezier(.2,.7,.2,1),opacity .2s ease,visibility 0s}
+.nav-item:hover .nav-dropdown a,.nav-item:focus-within .nav-dropdown a{opacity:1;transform:none}
+.sub-list{max-height:0;overflow:hidden;opacity:0;transition:max-height .35s cubic-bezier(.2,.7,.2,1),opacity .25s ease,margin .35s}
+.sub-group.open .sub-list,.sub-group:focus-within .sub-list{max-height:260px;opacity:1;margin-top:2px !important;margin-bottom:6px !important}
+.sub-group.open .sub-caret,.sub-group:focus-within .sub-caret{transform:rotate(180deg)}
+.sub-group.open > a{background:#EEF6E3;color:#1F3B16}
+.sub-list a:hover{background:#DCEEC6 !important}
+.nav-item:hover .nav-caret{transform:rotate(180deg)}
+.nav-dropdown a:hover{background:#EEF6E3;color:#1F3B16}
+@media (prefers-reduced-motion: reduce){.nav-dropdown,.nav-dropdown a,.sub-list{transition:none !important}}
+@media (max-width: 860px){.nav-links{display:none !important}.nav-burger{display:flex !important}.page-title{font-size:34px !important}}
+</style>
+</helmet>
+<div style="font-family: 'IBM Plex Sans KR', system-ui, sans-serif; color: #1B2516; background: #F6F9F1; min-height: 100vh; word-break: keep-all">
+
+  <!-- ============ PAGE HERO + HEADER (로그인 상태) ============ -->
+  <section style="position: relative; color: #FFFFFF; background: #1F3B16">
+    <img src="/_blob/5e129048270abca245665e955fddc5bb" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 45%">
+    <div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,38,14,0.88) 0%, rgba(20,38,14,0.70) 100%)"></div>
+
+    <div class="util-bar" style="position: relative; display: flex; justify-content: flex-end; align-items: center; gap: 20px; padding: 14px 40px 0; font-size: 13px">
+      <span style="color: {{primary}}; font-weight: 600">[이름]님 환영합니다</span>
+      <a href="MemberMain.dc.html" style="color: rgba(255,255,255,0.9); text-decoration: none">홈</a>
+      <a href="#" style="color: rgba(255,255,255,0.9); text-decoration: none">정보수정</a>
+      <a href="Main.dc.html" style="color: rgba(255,255,255,0.9); text-decoration: none">로그아웃</a>
+    </div>
+
+    <header class="site-header" style="position: relative; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 14px 40px 0; flex-wrap: wrap">
+      <a href="MemberMain.dc.html" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: #FFFFFF">
+        <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 5px">
+          <img src="/_blob/122f04b2c3721aa4a0194f5dc7c5de6e" alt="예수원교회" style="height: 40px; width: auto; display: block">
+          <span style="font-size: 11px; letter-spacing: 0.04em; opacity: 0.85">Jesuwon Community Church (ARPC)</span>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="주 메뉴" style="display: flex; gap: 30px; font-size: 17px; font-weight: 500">
+        <div class="nav-item" style="position: relative" onMouseLeave="{{closeSub}}">
+          <a href="About.dc.html" aria-haspopup="true" style="display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0">
+            교회안내
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
+          </a>
+          <div class="nav-dropdown" style="position: absolute; left: -12px; top: 100%; padding-top: 10px; z-index: 20">
+            <div style="width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid {{primary}}">
+              <div class="sub-group {{aboutCls}}" onMouseEnter="{{openAbout}}">
+                <a href="About.dc.html" aria-haspopup="true" style="display: flex; align-items: center; justify-content: space-between; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">
+                  예수원교회는
+                  <svg class="sub-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transition: transform 0.25s"><path d="M6 9l6 6 6-6"></path></svg>
+                </a>
+                <div class="sub-list" style="background: #EEF6E3; border-radius: 10px; margin: 0 4px">
+                  <a href="About.dc.html" style="display: block; padding: 10px 14px 10px 26px; border-radius: 8px; color: #2F5E17; text-decoration: none; font-size: 14px; font-weight: 500">예수원 소개</a>
+                  <a href="About.dc.html" style="display: block; padding: 10px 14px 10px 26px; border-radius: 8px; color: #2F5E17; text-decoration: none; font-size: 14px; font-weight: 500">목회관 &amp; 구조</a>
+                  <a href="About.dc.html" style="display: block; padding: 10px 14px 10px 26px; border-radius: 8px; color: #2F5E17; text-decoration: none; font-size: 14px; font-weight: 500">2세를 향한 비전</a>
+                  <a href="About.dc.html" style="display: block; padding: 10px 14px 10px 26px; border-radius: 8px; color: #2F5E17; text-decoration: none; font-size: 14px; font-weight: 500">예수원의 신앙고백</a>
+                </div>
+              </div>
+              <a href="#" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">예배 안내</a>
+              <a href="Serve.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">섬기는 분들</a>
+              <a href="MemberMain.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">찾아오시는 길</a>
+            </div>
+          </div>
+        </div>
+        <div class="nav-item" style="position: relative">
+          <a href="MemberWords.dc.html" aria-haspopup="true" style="display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0">
+            예배와 말씀
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
+          </a>
+          <div class="nav-dropdown" style="position: absolute; left: -12px; top: 100%; padding-top: 10px; z-index: 20">
+            <div style="width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid {{primary}}">
+              <a href="MemberWords.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">설교듣기</a>
+              <a href="MemberWords.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">예수원칼럼</a>
+              <a href="MemberWords.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">영상칼럼</a>
+              <a href="MemberWords.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">교리강좌</a>
+            </div>
+          </div>
+        </div>
+        <div class="nav-item" style="position: relative">
+          <a href="MemberMokjang.dc.html" aria-haspopup="true" style="display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0">
+            목장
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
+          </a>
+          <div class="nav-dropdown" style="position: absolute; left: -12px; top: 100%; padding-top: 10px; z-index: 20">
+            <div style="width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid {{primary}}">
+              <a href="MemberMokjang.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">장년목장</a>
+              <a href="MemberMokjang.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">탄자니아초원</a>
+              <a href="MemberMokjang.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">인디오초원</a>
+              <a href="MemberMokjang.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">주일학교</a>
+            </div>
+          </div>
+        </div>
+        <div class="nav-item" style="position: relative">
+          <a href="MemberUfeedem.dc.html" aria-haspopup="true" style="display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0">
+            Ufeedem
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
+          </a>
+          <div class="nav-dropdown" style="position: absolute; left: -12px; top: 100%; padding-top: 10px; z-index: 20">
+            <div style="width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid {{primary}}">
+              <a href="MemberUfeedem.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">선교지 소식</a>
+              <a href="MemberUfeedem.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">사랑의 나눔</a>
+              <a href="MemberUfeedem.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">GST 신학교</a>
+            </div>
+          </div>
+        </div>
+        <div class="nav-item" style="position: relative">
+          <a href="#" aria-current="page" aria-haspopup="true" style="display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0; box-shadow: inset 0 -3px 0 {{primary}}">
+            교육과 훈련
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
+          </a>
+          <div class="nav-dropdown" style="position: absolute; left: -12px; top: 100%; padding-top: 10px; z-index: 20">
+            <div style="width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid {{primary}}">
+              <a href="Edu.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1F3B16; background: #EEF6E3; text-decoration: none; font-size: 15px; font-weight: 600">예수원 새가족반</a>
+            </div>
+          </div>
+        </div>
+        <div class="nav-item" style="position: relative">
+          <a href="MemberRest.dc.html" aria-haspopup="true" style="display: inline-flex; align-items: center; gap: 6px; color: #FFFFFF; text-decoration: none; padding: 10px 0">
+            쉴만한 물가
+            <svg class="nav-caret" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transition: transform 0.2s"><path d="M6 9l6 6 6-6"></path></svg>
+          </a>
+          <div class="nav-dropdown" style="position: absolute; right: 0; top: 100%; padding-top: 10px; z-index: 20">
+            <div style="width: 220px; background: #FFFFFF; border-radius: 14px; box-shadow: 0 14px 40px rgba(14,24,10,0.22); padding: 8px; border-top: 4px solid {{primary}}">
+              <a href="MemberRest.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">사진 앨범</a>
+              <a href="MemberRest.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">동영상 앨범</a>
+              <a href="MemberRest.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">예수원 게시판</a>
+              <a href="MemberRest.dc.html" style="display: block; padding: 11px 14px; border-radius: 8px; color: #1B2516; text-decoration: none; font-size: 15px; font-weight: 500">교회소식</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <button class="nav-burger" aria-label="메뉴 열기" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.5); background: transparent; color: #FFFFFF; align-items: center; justify-content: center; cursor: pointer">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M4 12h16"></path><path d="M4 17h16"></path></svg>
+      </button>
+    </header>
+
+    <div style="position: relative; max-width: 1200px; margin: 0 auto; padding: 72px 40px 64px; box-sizing: border-box">
+      <p style="margin: 0 0 12px; font-size: 14px; letter-spacing: 0.14em; color: {{primary}}; font-weight: 700">NEW FAMILY CLASS</p>
+      <h1 class="page-title" style="margin: 0; font-family: 'Gowun Batang', serif; font-size: 48px; font-weight: 700">예수원 새가족반</h1>
+      <nav aria-label="현재 위치" style="display: flex; align-items: center; gap: 10px; margin-top: 18px; font-size: 14px; color: rgba(255,255,255,0.8)">
+        <a href="MemberMain.dc.html" style="color: rgba(255,255,255,0.85); text-decoration: none">홈</a>
+        <span aria-hidden="true">›</span>
+        <span>교육과 훈련</span>
+        <span aria-hidden="true">›</span>
+        <span style="color: #FFFFFF; font-weight: 600">예수원 새가족반</span>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ============ CONTENT ============ -->
+  <main style="max-width: 1100px; margin: 0 auto; padding: 56px 40px 96px; box-sizing: border-box">
+    <div style="display: flex; flex-direction: column; gap: 20px">
+      <sc-for list="{{pages}}" as="pg" hint-placeholder-count="4">
+        <img src="{{pg.img}}" alt="{{pg.alt}}" style="width: 100%; display: block; border-radius: 12px; background: #FFFFFF; box-shadow: 0 6px 20px rgba(27,37,22,0.08)">
+      </sc-for>
+    </div>
+  </main>
+
+  <footer style="background: #16220F; color: rgba(255,255,255,0.8); padding: 56px 40px 40px">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px">
+      <img src="/_blob/122f04b2c3721aa4a0194f5dc7c5de6e" alt="예수원교회" style="height: 34px; width: auto; align-self: flex-start; display: block">
+      <span style="font-size: 14px; line-height: 1.8">Jesuwon Community Church in Philadelphia<br>220 Upland Avenue Horsham, PA 19044<br>Tel. 484-686-1232 · Email. jesuwonch@gmail.com</span>
+    </div>
+    <div style="max-width: 1200px; margin: 32px auto 0; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.12); font-size: 13px; color: rgba(255,255,255,0.6)">Copyright © 2023- 예수원교회. All rights reserved.</div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"primary":{"editor":"color","default":"#8BC34A","options":["#8BC34A","#9BCF53","#7CB342","#A5D46A"]},"$preview":{"width":1440,"height":18000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const st = this.state || {};
+    const openSub = st.openSub || null;
+    const IDS = ['5e129048270abca245665e955fddc5bb','58d4e13a86e7269e9720e69438f93513','4b00ae71e4db63ed38921bcbbed05143','7b7001dfa9309d3c42342563c901be74','608b52dad45950cd1d586d37c0439deb','7d8f10ffd15bbe9a58af6fa9cd895677','15e8590bdbfe8172a231aa48f19ab992','236511efcec8f94f1a829725f55325cf','ab0f245ca424afe49884202b6b104c24','af290fa598a08c68a7d00b7e23dbad4a','e556f505a8e07cb6fd9e3994715a09ae','e9528078fc98f632ca081b9d682ef00a','3dbbcb471550ab84fef3df027f2fb92e','a828f264e7669fe2a77a7cd95f510700','0a38cc39031fcd084ede74f0fa0b5e36','edb78c4073c45e28c9e68efa8c06a229','29de0aa5accc2974d100e403b83c7d65','2ad8fcdc528d983385e10832d1d241ae','512503d3a422ddb6e7c796ca8fdb87d7','f4a31bf828ce2323aecc515196223d95','52a835b6bfd99d177da623a4f11e4f5d','ac63fd3aed86837c3b4a135ce1c43a0f','2c23821718204bcd4d7e0978a9d82451'];
+    return {
+      primary: this.props.primary ?? '#8BC34A',
+      pages: IDS.map((id, k) => ({ img: '/_blob/' + id, alt: '예수원 새가족반 교재 ' + (k + 1) + '쪽' })),
+      aboutCls: openSub === 'about' ? 'open' : '',
+      openAbout: () => { if (openSub !== 'about') this.setState({ openSub: 'about' }); },
+      closeSub: () => { if (openSub !== null) this.setState({ openSub: null }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

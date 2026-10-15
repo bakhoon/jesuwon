@@ -1,0 +1,549 @@
+'use client';
+// 이 파일은 tools/convert-design.mjs 가 design/AdminHomepage.dc.html 에서 자동으로 만든 파일이에요.
+// 화면을 고치려면 design 파일을 고친 뒤 `npm run convert` 를 다시 돌리세요.
+import React, { useEffect } from 'react';
+import { A, DCLogic, asset, css, useDC } from '@/lib/dc';
+
+const STYLE = "\nbody{margin:0;background:#F3F5EF}\n*{box-sizing:border-box}\na{color:#2F5E17}\n.side-link{transition:background .15s,color .15s}\n.side-link:hover{background:rgba(255,255,255,0.08);color:#FFFFFF}\n.btn{transition:filter .15s,background .15s}\n.btn:hover{filter:brightness(0.95)}\n.btn-ghost:hover{background:#EEF6E3 !important}\n.row-hover:hover{background:#F8FBF4}\n.adm input[type=text],.adm input[type=email],.adm input[type=password],.adm input[type=number],.adm input[type=date],.adm input[type=search],.adm select,.adm textarea{font-family:inherit;font-size:15px;color:#1B2516;background:#FFFFFF;border:1px solid #C9D3BC;border-radius:10px}\n.adm input:focus,.adm select:focus,.adm textarea:focus{outline:none;border-color:#4F8F25;box-shadow:0 0 0 3px rgba(139,195,74,0.35)}\n.adm button:focus-visible,.adm a:focus-visible{outline:3px solid #8BC34A;outline-offset:2px}\n.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}\n.toast{animation:toastIn .25s ease}\n@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}\n@media (prefers-reduced-motion: reduce){.toast{animation:none}}\n@media (max-width: 960px){.adm-side{display:none !important}.adm-main{padding:20px !important}}\n.adm button:disabled{opacity:.35;cursor:default}@media (max-width: 1150px){.hp-grid{grid-template-columns:1fr !important}}@media (max-width: 900px){.ed-grid,.mis-prev{grid-template-columns:1fr !important}}\n";
+
+class Component extends DCLogic {
+  flash(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: '' }), 2200);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const set = (p) => this.setState(Object.assign({ dirty: true }, p));
+    const DEF = [
+      { id: 'banner', label: '메인 배너', sub: '배너 관리에서 사진을 바꿔요', eyebrow: 'HERO', desc: '홈 첫 화면에 넘어가는 큰 사진이에요.', vis: true },
+      { id: 'quick', label: '바로가기 카드', sub: '4개 카드 제목 · 설명 · 연결', eyebrow: 'QUICK LINKS', desc: '배너 바로 아래 흰 카드 4개예요.', vis: true },
+      { id: 'news', label: '교회소식 · 예수원 칼럼', sub: '자동 (최신 글)', eyebrow: 'NEWS', desc: '교회소식과 예수원 칼럼의 최신 글 목록이에요.', vis: true },
+      { id: 'sermon', label: '이번 주 설교', sub: '유튜브 링크 · 제목 · 본문', eyebrow: 'SUNDAY SERMON', desc: '연두색 띠에 나오는 이번 주 설교 영상이에요.', vis: true },
+      { id: 'album', label: '사진 앨범', sub: '자동 (최신 앨범)', eyebrow: 'PHOTO ALBUM', desc: '최신 사진 앨범이 격자로 나와요.', vis: true },
+      { id: 'mission', label: '선교 영상', sub: '유튜브 링크 · 소개 문구', eyebrow: 'MISSION', desc: '선교지 영상과 소개 문구예요. 선교팀이 다녀오면 바꿔 주세요.', vis: true },
+      { id: 'visit', label: '오시는 길', sub: '주소 · 연락처 · 지도', eyebrow: 'LOCATION', desc: '홈 맨 아래 교회 위치 안내예요.', vis: true }
+    ];
+    const order = st.order || DEF.map((d) => d.id);
+    const vis = st.vis || {};
+    const selId = st.sel || 'mission';
+    const byId = Object.fromEntries(DEF.map((d) => [d.id, d]));
+    const move = (i, d) => { const a = order.slice(); const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; set({ order: a }); };
+    const sections = order.map((id, i) => {
+      const d = byId[id]; const on = id === selId; const shown = vis[id] !== false;
+      return {
+        label: d.label, sub: shown ? d.sub : '홈에서 숨김', on: on ? 'true' : 'false',
+        style: 'display: flex; align-items: center; gap: 6px; padding: 12px; border-radius: 12px;' + (on ? ' background: #EEF6E3; box-shadow: inset 3px 0 0 #8BC34A;' : '') + (shown ? '' : ' opacity: 0.55;'),
+        pick: () => this.setState({ sel: id }),
+        isFirst: i === 0, isLast: i === order.length - 1,
+        up: () => move(i, -1), down: () => move(i, 1),
+        visAria: shown ? 'true' : 'false',
+        switchStyle: 'flex-shrink: 0; position: relative; width: 42px; height: 24px; margin-left: 4px; border-radius: 999px; border: none; cursor: pointer; padding: 0; background: ' + (shown ? '#4F8F25' : '#C9D3BC'),
+        knobStyle: 'position: absolute; top: 3px; left: ' + (shown ? '21px' : '3px') + '; width: 18px; height: 18px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.25); transition: left .2s',
+        toggle: () => set({ vis: Object.assign({}, vis, { [id]: !shown }) })
+      };
+    });
+
+    const ytId = (u) => { const m = String(u || '').match(/(?:youtu\.be\/|v=|embed\/|shorts\/|live\/)([A-Za-z0-9_-]{11})/); return m ? m[1] : null; };
+    const ytStatus = (u) => !u ? ['링크를 붙여넣으세요', '#56634F'] : (ytId(u) ? ['✓ 영상 ID 확인됨: ' + ytId(u), '#2F5E17'] : ['유튜브 링크 형식이 아니에요', '#B3261E']);
+    const field = (key, obj, k) => (e) => set({ [key]: Object.assign({}, obj, { [k]: e.target.value }) });
+
+    const ser = st.ser || { url: '', title: '', verse: '', preacher: '윤성종', date: '2026-10-18' };
+    const sS = ytStatus(ser.url);
+    const mis = st.mis || { url: 'https://youtu.be/XXXXXXXXXXX', eyebrow: '탄자니아 선교 2026', title: '땅끝까지 복음을, 함께', body: '예수원교회는 매년 탄자니아 루호롤레와 미케세 지역을 찾아 현지 교회와 함께 예배하고 섬기고 있습니다.\n올해도 기도와 후원으로 함께해 주신 모든 분께 감사드립니다.', button: '선교지 소식 보기', link: 'Ufeedem › 선교지 소식' };
+    const mS = ytStatus(mis.url);
+    const visit = st.visit || { addr: '220 Upland Avenue Horsham, PA 19044', phone: '484-686-1232', email: 'jesuwonch@gmail.com', map: 'https://maps.google.com/?q=220+Upland+Ave+Horsham+PA' };
+    const quickD = st.quick || [
+      { title: '교회안내', sub: '예수원교회를 소개합니다', link: '교회안내 › 예수원교회는' },
+      { title: '예배/모임 안내', sub: '예배시간을 안내합니다', link: '교회안내 › 예배 안내' },
+      { title: '새가족 안내', sub: '처음 오신 분을 안내합니다', link: '교육과 훈련 › 새가족반' },
+      { title: '오시는 길', sub: '교회 오시는 길 안내합니다', link: '교회안내 › 찾아오시는 길' }
+    ];
+    const pageOpts = ['교회안내 › 예수원교회는', '교회안내 › 예배 안내', '교회안내 › 찾아오시는 길', '교육과 훈련 › 새가족반', 'Ufeedem › 선교지 소식', 'Ufeedem › 사랑의 나눔', '쉴만한 물가 › 사진 앨범'];
+    const autoCount = (st.autoCount || {})[selId] || (selId === 'album' ? '8' : '5');
+
+    return {
+      sections, pageOpts,
+      cur: byId[selId],
+      isBanner: selId === 'banner', isQuick: selId === 'quick', isAuto: selId === 'news' || selId === 'album',
+      isSermon: selId === 'sermon', isMission: selId === 'mission', isVisit: selId === 'visit',
+      pendingCount: '3',
+      bannerThumbs: ['84362616dfc60110980f8195a823a4b0', 'e33fafc038121ac64386ebaac161efc5', '3070e8010272e1554ec889aacaf15be1', 'c03a3e2bcf9d8de53ca200225920f242', '1af25c64d7ad7ee9bae88ac8793b59e8'].map((id) => '/_blob/' + id),
+      autoWhat: selId === 'album' ? '쉴만한 물가 › 사진 앨범' : '교회소식, 예수원칼럼',
+      autoCount, onAutoCount: (e) => set({ autoCount: Object.assign({}, st.autoCount || {}, { [selId]: e.target.value }) }),
+      quick: quickD.map((q, i) => ({
+        n: String(i + 1), title: q.title, sub: q.sub, link: q.link,
+        onTitle: (e) => set({ quick: quickD.map((x, k) => (k === i ? Object.assign({}, x, { title: e.target.value }) : x)) }),
+        onSub: (e) => set({ quick: quickD.map((x, k) => (k === i ? Object.assign({}, x, { sub: e.target.value }) : x)) }),
+        onLink: (e) => set({ quick: quickD.map((x, k) => (k === i ? Object.assign({}, x, { link: e.target.value }) : x)) })
+      })),
+      ser: Object.assign({}, ser, {
+        status: sS[0], statusColor: sS[1],
+        previewTitle: ser.title || '[설교 제목]',
+        previewSub: '본문 ' + (ser.verse || '[성경 본문]') + ' · ' + (ser.preacher || '[설교자]') + ' 목사',
+        onUrl: field('ser', ser, 'url'), onTitle: field('ser', ser, 'title'), onVerse: field('ser', ser, 'verse'), onPreacher: field('ser', ser, 'preacher'), onDate: field('ser', ser, 'date')
+      }),
+      mis: Object.assign({}, mis, {
+        status: mS[0], statusColor: mS[1], len: String((mis.body || '').length),
+        onUrl: field('mis', mis, 'url'), onEyebrow: field('mis', mis, 'eyebrow'), onTitle: field('mis', mis, 'title'), onBody: field('mis', mis, 'body'), onButton: field('mis', mis, 'button'), onLink: field('mis', mis, 'link')
+      }),
+      visit: Object.assign({}, visit, { onAddr: field('visit', visit, 'addr'), onPhone: field('visit', visit, 'phone'), onEmail: field('visit', visit, 'email'), onMap: field('visit', visit, 'map') }),
+      saveLabel: st.dirty ? '변경사항 저장 •' : '저장됨',
+      saveAll: () => { this.setState({ dirty: false }); this.flash('홈 화면을 저장했어요. 바로 사이트에 반영돼요'); },
+      hasToast: !!st.toast, toast: st.toast || ''
+    };
+  }
+}
+
+export default function Page() {
+  const v = useDC(Component);
+  useEffect(() => { document.title = "관리자 · 홈 화면 관리"; }, []);
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: STYLE }} />
+      <div className="adm" style={css("font-family: 'IBM Plex Sans KR', system-ui, sans-serif; color: #1B2516; background: #F3F5EF; min-height: 100vh; display: flex; word-break: keep-all")}>
+        <aside className="adm-side" aria-label="관리자 메뉴" style={css("width: 256px; flex-shrink: 0; background: #1F3B16; color: #FFFFFF; display: flex; flex-direction: column; padding: 24px 16px")}>
+          <A href="AdminHome.dc.html" style={css("display: flex; flex-direction: column; gap: 8px; padding: 0 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.12); text-decoration: none; color: #FFFFFF")}>
+            <img src={asset("/_blob/122f04b2c3721aa4a0194f5dc7c5de6e")} alt="예수원교회" style={css("height: 34px; width: auto; align-self: flex-start; display: block")} />
+            <span style={css("font-size: 13px; font-weight: 600; color: #8BC34A; letter-spacing: 0.06em")}>
+              {"ADMIN · 관리자"}
+            </span>
+          </A>
+          <nav style={css("flex: 1")}>
+            <div style={css("height: 14px")} />
+            <A className="side-link" href="AdminHome.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"대시보드"}
+              </span>
+            </A>
+            <p style={css("margin: 22px 0 8px; padding: 0 14px; font-size: 12px; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); font-weight: 700")}>
+              {"회원"}
+            </p>
+            <A className="side-link" href="AdminMembers.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"회원 관리"}
+              </span>
+              <span style={css("min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px; background: #F2C94C; color: #1B2516; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center")}>
+                {v.pendingCount}
+              </span>
+            </A>
+            <p style={css("margin: 22px 0 8px; padding: 0 14px; font-size: 12px; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); font-weight: 700")}>
+              {"사이트"}
+            </p>
+            <A className="side-link" href="AdminHomepage.dc.html" aria-current="page" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; background: #8BC34A; color: #1B2516; font-weight: 700")}>
+              <span>
+                {"홈 화면 관리"}
+              </span>
+            </A>
+            <A className="side-link" href="AdminBanner.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"배너 관리"}
+              </span>
+            </A>
+            <A className="side-link" href="AdminPopup.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"팝업창 관리"}
+              </span>
+            </A>
+            <A className="side-link" href="AdminAbout.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"교회 소개 관리"}
+              </span>
+            </A>
+            <A className="side-link" href="AdminServe.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"섬기는 분들 관리"}
+              </span>
+            </A>
+            <p style={css("margin: 22px 0 8px; padding: 0 14px; font-size: 12px; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); font-weight: 700")}>
+              {"콘텐츠"}
+            </p>
+            <span style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 0 14px; font-size: 15px; color: rgba(255,255,255,0.45)")}>
+              <span>
+                {"설교 · 칼럼"}
+              </span>
+              <span style={css("font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25)")}>
+                {"준비 중"}
+              </span>
+            </span>
+            <span style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 0 14px; font-size: 15px; color: rgba(255,255,255,0.45)")}>
+              <span>
+                {"사진 · 동영상 앨범"}
+              </span>
+              <span style={css("font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25)")}>
+                {"준비 중"}
+              </span>
+            </span>
+            <span style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 0 14px; font-size: 15px; color: rgba(255,255,255,0.45)")}>
+              <span>
+                {"게시판 · 교회소식"}
+              </span>
+              <span style={css("font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25)")}>
+                {"준비 중"}
+              </span>
+            </span>
+          </nav>
+          <A className="side-link" href="MemberMain.dc.html" style={css("display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; color: rgba(255,255,255,0.82); text-decoration: none; font-size: 14px")}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+            {" 사이트로 돌아가기 "}
+          </A>
+        </aside>
+        <div style={css("flex: 1; min-width: 0; display: flex; flex-direction: column")}>
+          <header style={css("display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 32px; background: #FFFFFF; border-bottom: 1px solid #E1E8D6")}>
+            <div>
+              <p style={css("margin: 0; font-size: 13px; color: #56634F")}>
+                {"관리자 › 사이트 › 홈 화면 관리"}
+              </p>
+              <h1 style={css("margin: 2px 0 0; font-family: 'Gowun Batang', serif; font-size: 26px; font-weight: 700")}>
+                {"홈 화면 관리"}
+              </h1>
+            </div>
+            <div style={css("display: flex; align-items: center; gap: 14px")}>
+              <span style={css("width: 38px; height: 38px; border-radius: 999px; background: #EEF6E3; color: #2F5E17; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px")} aria-hidden="true">
+                {"웹"}
+              </span>
+              <span style={css("display: flex; flex-direction: column; line-height: 1.3")}>
+                <b style={css("font-size: 14px")}>
+                  {"웹섬김이"}
+                </b>
+                <span style={css("font-size: 12px; color: #56634F")}>
+                  {"관리자"}
+                </span>
+              </span>
+              <A href="Main.dc.html" style={css("margin-left: 8px; min-height: 40px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 10px; border: 1px solid #D3DCC6; color: #1B2516; text-decoration: none; font-size: 14px")}>
+                {"로그아웃"}
+              </A>
+            </div>
+          </header>
+          <main className="adm-main" style={css("flex: 1; padding: 32px; max-width: 1240px; width: 100%")}>
+            <div style={css("display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px")}>
+              <p style={css("margin: 0; font-size: 15px; color: #2E3A28")}>
+                {"홈 화면에 나오는 순서대로예요. 왼쪽에서 고를 섹션을 누르고 오른쪽에서 내용을 바꾸세요."}
+              </p>
+              <div style={css("display: flex; gap: 8px")}>
+                <A href="MemberMain.dc.html" className="btn-ghost" style={css("min-height: 44px; padding: 0 18px; border: 1px solid #D3DCC6; border-radius: 10px; background: #FFFFFF; color: #1B2516; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none")}>
+                  {"홈에서 보기"}
+                </A>
+                <button className="btn" onClick={v.saveAll} style={css("min-height: 44px; padding: 0 18px; border: none; border-radius: 10px; background: #1F3B16; color: #FFFFFF; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px")}>
+                  {v.saveLabel}
+                </button>
+              </div>
+            </div>
+            <div style={css("display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; align-items: start")} className="hp-grid">
+              <section style={css("background: #FFFFFF; border: 1px solid #E1E8D6; border-radius: 16px; padding: 10px")} aria-label="홈 화면 섹션">
+                {(v.sections || []).map((s, _i0) => (
+                  <React.Fragment key={_i0}>
+                    <div style={css(s.style)}>
+                      <button onClick={s.pick} aria-pressed={s.on} style={css("flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; padding: 0; border: none; background: transparent; font-family: inherit; text-align: left; cursor: pointer")}>
+                        <span style={css("font-size: 15px; font-weight: 700; color: #1B2516")}>
+                          {s.label}
+                        </span>
+                        <span style={css("font-size: 12px; color: #56634F")}>
+                          {s.sub}
+                        </span>
+                      </button>
+                      <button aria-label={`${s.label ?? ""} 위로`} disabled={!!(s.isFirst) && s.isFirst !== 'false'} onClick={s.up} style={css("width: 34px; height: 34px; border-radius: 8px; border: 1px solid #D3DCC6; background: #FFFFFF; color: #1B2516; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; flex-shrink: 0")}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M6 15l6-6 6 6" />
+                        </svg>
+                      </button>
+                      <button aria-label={`${s.label ?? ""} 아래로`} disabled={!!(s.isLast) && s.isLast !== 'false'} onClick={s.down} style={css("width: 34px; height: 34px; border-radius: 8px; border: 1px solid #D3DCC6; background: #FFFFFF; color: #1B2516; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; flex-shrink: 0")}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                          <path d="M6 9l6 6 6-6" />
+                        </svg>
+                      </button>
+                      <button role="switch" aria-checked={s.visAria} aria-label={`${s.label ?? ""} 홈에 표시`} onClick={s.toggle} style={css(s.switchStyle)}>
+                        <span style={css(s.knobStyle)} />
+                      </button>
+                    </div>
+                  </React.Fragment>
+                ))}
+              </section>
+              <section style={css("background: #FFFFFF; border: 1px solid #E1E8D6; border-radius: 16px; padding: 26px 28px; display: flex; flex-direction: column; gap: 18px")}>
+                <div>
+                  <p style={css("margin: 0; font-size: 13px; letter-spacing: 0.12em; color: #3F7A1C; font-weight: 700")}>
+                    {v.cur.eyebrow}
+                  </p>
+                  <h2 style={css("margin: 4px 0 0; font-size: 22px; font-weight: 700")}>
+                    {v.cur.label}
+                  </h2>
+                  <p style={css("margin: 6px 0 0; font-size: 14px; color: #56634F")}>
+                    {v.cur.desc}
+                  </p>
+                </div>
+                {(v.isBanner) ? (
+                  <>
+                  <div style={css("display: flex; flex-direction: column; gap: 14px")}>
+                    <div style={css("display: flex; gap: 10px; overflow-x: auto")}>
+                      {(v.bannerThumbs || []).map((b, _i1) => (
+                        <React.Fragment key={_i1}>
+                          <img src={asset(b)} alt="" style={css("width: 150px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 8px; flex-shrink: 0")} />
+                        </React.Fragment>
+                      ))}
+                    </div>
+                    <A href="AdminBanner.dc.html" style={css("min-height: 44px; padding: 0 18px; border: none; border-radius: 10px; background: #8BC34A; color: #1B2516; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; align-self: flex-start")}>
+                      {"배너 관리로 가기 ›"}
+                    </A>
+                  </div>
+                  </>
+                ) : null}
+                {(v.isQuick) ? (
+                  <>
+                  <div style={css("display: grid; grid-template-columns: 1fr 1fr; gap: 14px")}>
+                    {(v.quick || []).map((q, _i2) => (
+                      <React.Fragment key={_i2}>
+                        <div style={css("border: 1px solid #E1E8D6; border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 10px")}>
+                          <p style={css("margin: 0; font-size: 13px; font-weight: 700; color: #3F7A1C")}>
+                            {"카드 "}{q.n}
+                          </p>
+                          <input type="text" aria-label={`카드 ${q.n ?? ""} 제목`} value={q.title ?? ''} onChange={q.onTitle} style={css("min-height: 44px; padding: 0 14px; width: 100%; font-weight: 700")} />
+                          <input type="text" aria-label={`카드 ${q.n ?? ""} 설명`} value={q.sub ?? ''} onChange={q.onSub} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                          <select aria-label={`카드 ${q.n ?? ""} 연결 페이지`} value={q.link ?? ''} onChange={q.onLink} style={css("min-height: 44px; padding: 0 14px; width: 100%")}>
+                            {(v.pageOpts || []).map((o, _i3) => (
+                              <React.Fragment key={_i3}>
+                                <option value={o}>
+                                  {o}
+                                </option>
+                              </React.Fragment>
+                            ))}
+                          </select>
+                        </div>
+                      </React.Fragment>
+                    ))}
+                  </div>
+                  </>
+                ) : null}
+                {(v.isAuto) ? (
+                  <>
+                  <div style={css("display: flex; flex-direction: column; gap: 14px")}>
+                    <p style={css("margin: 0; padding: 14px 16px; border-radius: 12px; background: #EEF6E3; font-size: 14px; line-height: 1.7; color: #1F3B16")}>
+                      {"이 섹션은 따로 입력할 필요 없어요. "}{v.autoWhat}{"에 글을 올리면 최신 글이 자동으로 홈에 나와요."}
+                    </p>
+                    <div style={css("max-width: 240px")}>
+                      <label htmlFor="auto-n" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                        {"보여줄 개수"}
+                      </label>
+                      <select id="auto-n" value={v.autoCount ?? ''} onChange={v.onAutoCount} style={css("min-height: 44px; padding: 0 14px; width: 100%")}>
+                        <option value="3">
+                          {"3개"}
+                        </option>
+                        <option value="5">
+                          {"5개"}
+                        </option>
+                        <option value="7">
+                          {"7개"}
+                        </option>
+                        <option value="8">
+                          {"8개"}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                  </>
+                ) : null}
+                {(v.isSermon) ? (
+                  <>
+                  <div style={css("display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start")} className="ed-grid">
+                    <div style={css("display: flex; flex-direction: column; gap: 14px")}>
+                      <div>
+                        <label htmlFor="ser-url" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"유튜브 링크"}
+                        </label>
+                        <input id="ser-url" type="text" placeholder="https://www.youtube.com/watch?v=..." value={v.ser.url ?? ''} onChange={v.ser.onUrl} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                        <p style={css(`margin: 6px 0 0; font-size: 13px; color: #56634F; color: ${v.ser.statusColor ?? ""}; font-weight: 600`)}>
+                          {v.ser.status}
+                        </p>
+                      </div>
+                      <div>
+                        <label htmlFor="ser-t" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"설교 제목"}
+                        </label>
+                        <input id="ser-t" type="text" value={v.ser.title ?? ''} onChange={v.ser.onTitle} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                      </div>
+                      <div style={css("display: grid; grid-template-columns: 1fr 1fr; gap: 12px")}>
+                        <div>
+                          <label htmlFor="ser-v" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                            {"본문"}
+                          </label>
+                          <input id="ser-v" type="text" placeholder="예: 요13:34" value={v.ser.verse ?? ''} onChange={v.ser.onVerse} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                        </div>
+                        <div>
+                          <label htmlFor="ser-p" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                            {"설교자"}
+                          </label>
+                          <input id="ser-p" type="text" value={v.ser.preacher ?? ''} onChange={v.ser.onPreacher} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                        </div>
+                      </div>
+                      <div style={css("max-width: 240px")}>
+                        <label htmlFor="ser-d" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"날짜"}
+                        </label>
+                        <input id="ser-d" type="date" value={v.ser.date ?? ''} onChange={v.ser.onDate} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                      </div>
+                    </div>
+                    <div>
+                      <p style={css("margin: 0 0 8px; font-size: 14px; font-weight: 600")}>
+                        {"홈 미리보기"}
+                      </p>
+                      <div style={css("border-radius: 14px; overflow: hidden; background: #8BC34A; padding: 16px")}>
+                        <p style={css("margin: 0; font-size: 10px; letter-spacing: 0.14em; font-weight: 700; color: #1F3B16")}>
+                          {"SUNDAY SERMON"}
+                        </p>
+                        <div style={css("position: relative; margin-top: 8px; aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #1F3B16; display: flex; align-items: center; justify-content: center")}>
+                          <img src={asset("/_blob/c03a3e2bcf9d8de53ca200225920f242")} alt="" style={css("position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.45")} />
+                          <span style={css("position: relative; width: 44px; height: 32px; border-radius: 8px; background: #E62117; display: flex; align-items: center; justify-content: center")}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                              <path d="M8 5v14l11-7z" fill="#FFFFFF" />
+                            </svg>
+                          </span>
+                        </div>
+                        <p style={css("margin: 10px 0 0; font-family: 'Gowun Batang', serif; font-size: 16px; font-weight: 700; color: #1B2516")}>
+                          {v.ser.previewTitle}
+                        </p>
+                        <p style={css("margin: 4px 0 0; font-size: 12px; color: #1F3B16")}>
+                          {v.ser.previewSub}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  </>
+                ) : null}
+                {(v.isMission) ? (
+                  <>
+                  <div style={css("display: flex; flex-direction: column; gap: 18px")}>
+                    <div style={css("border-radius: 16px; overflow: hidden; background: #1F3B16; color: #FFFFFF; display: grid; grid-template-columns: 1.1fr 1fr")} className="mis-prev">
+                      <div style={css("position: relative; aspect-ratio: 16 / 10; display: flex; align-items: center; justify-content: center")}>
+                        <img src={asset("/_blob/cae33ee39b332afcd29250f7aa418fa4")} alt="" style={css("position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover")} />
+                        <span style={css("position: relative; width: 56px; height: 56px; border-radius: 999px; background: #8BC34A; display: flex; align-items: center; justify-content: center")}>
+                          <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M8 5v14l11-7z" fill="#1B2516" />
+                          </svg>
+                        </span>
+                      </div>
+                      <div style={css("padding: 22px")}>
+                        <p style={css("margin: 0; font-size: 11px; letter-spacing: 0.14em; color: #8BC34A; font-weight: 700")}>
+                          {v.mis.eyebrow}
+                        </p>
+                        <p style={css("margin: 8px 0 0; font-family: 'Gowun Batang', serif; font-size: 20px; font-weight: 700; line-height: 1.35")}>
+                          {v.mis.title}
+                        </p>
+                        <p style={css("margin: 10px 0 0; font-size: 13px; line-height: 1.7; color: rgba(255,255,255,0.85); white-space: pre-line")}>
+                          {v.mis.body}
+                        </p>
+                        <span style={css("display: inline-flex; margin-top: 14px; padding: 8px 14px; border-radius: 999px; background: #8BC34A; color: #1B2516; font-size: 12px; font-weight: 700")}>
+                          {v.mis.button}
+                        </span>
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="mis-url" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                        {"유튜브 링크"}
+                      </label>
+                      <input id="mis-url" type="text" placeholder="https://www.youtube.com/watch?v=..." value={v.mis.url ?? ''} onChange={v.mis.onUrl} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                      <p style={css(`margin: 6px 0 0; font-size: 13px; color: #56634F; color: ${v.mis.statusColor ?? ""}; font-weight: 600`)}>
+                        {v.mis.status}
+                      </p>
+                    </div>
+                    <div style={css("display: grid; grid-template-columns: 1fr 1fr; gap: 12px")}>
+                      <div>
+                        <label htmlFor="mis-e" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"작은 제목"}
+                        </label>
+                        <input id="mis-e" type="text" value={v.mis.eyebrow ?? ''} onChange={v.mis.onEyebrow} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                      </div>
+                      <div>
+                        <label htmlFor="mis-t" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"큰 제목"}
+                        </label>
+                        <input id="mis-t" type="text" value={v.mis.title ?? ''} onChange={v.mis.onTitle} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="mis-b" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                        {"소개 문구"}
+                      </label>
+                      <textarea id="mis-b" rows="4" value={v.mis.body ?? ''} onChange={v.mis.onBody} style={css("width: 100%; padding: 12px 14px; line-height: 1.6; resize: vertical")} />
+                      <p style={css("margin: 6px 0 0; font-size: 13px; color: #56634F")}>
+                        {"두세 문장이 가장 보기 좋아요. ("}{v.mis.len}{"자)"}
+                      </p>
+                    </div>
+                    <div style={css("display: grid; grid-template-columns: 1fr 1fr; gap: 12px")}>
+                      <div>
+                        <label htmlFor="mis-bt" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"버튼 글자"}
+                        </label>
+                        <input id="mis-bt" type="text" value={v.mis.button ?? ''} onChange={v.mis.onButton} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                      </div>
+                      <div>
+                        <label htmlFor="mis-bl" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"버튼 연결"}
+                        </label>
+                        <select id="mis-bl" value={v.mis.link ?? ''} onChange={v.mis.onLink} style={css("min-height: 44px; padding: 0 14px; width: 100%")}>
+                          {(v.pageOpts || []).map((o, _i4) => (
+                            <React.Fragment key={_i4}>
+                              <option value={o}>
+                                {o}
+                              </option>
+                            </React.Fragment>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  </>
+                ) : null}
+                {(v.isVisit) ? (
+                  <>
+                  <div style={css("display: flex; flex-direction: column; gap: 14px; max-width: 560px")}>
+                    <div>
+                      <label htmlFor="v-a" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                        {"주소"}
+                      </label>
+                      <input id="v-a" type="text" value={v.visit.addr ?? ''} onChange={v.visit.onAddr} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                    </div>
+                    <div style={css("display: grid; grid-template-columns: 1fr 1fr; gap: 12px")}>
+                      <div>
+                        <label htmlFor="v-p" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"전화"}
+                        </label>
+                        <input id="v-p" type="text" value={v.visit.phone ?? ''} onChange={v.visit.onPhone} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                      </div>
+                      <div>
+                        <label htmlFor="v-e" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"이메일"}
+                        </label>
+                        <input id="v-e" type="text" value={v.visit.email ?? ''} onChange={v.visit.onEmail} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                      </div>
+                    </div>
+                    <div>
+                      <label htmlFor="v-m" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                        {"구글 지도 링크"}
+                      </label>
+                      <input id="v-m" type="text" value={v.visit.map ?? ''} onChange={v.visit.onMap} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                      <p style={css("margin: 6px 0 0; font-size: 13px; color: #56634F")}>
+                        {"구글 지도에서 [공유] › [지도 퍼가기]의 주소를 붙여넣으세요."}
+                      </p>
+                    </div>
+                  </div>
+                  </>
+                ) : null}
+              </section>
+            </div>
+          </main>
+        </div>
+        {(v.hasToast) ? (
+          <>
+          <div className="toast" role="status" style={css("position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 12px; background: #1F3B16; color: #FFFFFF; font-size: 15px; box-shadow: 0 12px 30px rgba(14,24,10,0.3)")}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12l5 5 9-10" />
+            </svg>
+            {" "}{v.toast}{" "}
+          </div>
+          </>
+        ) : null}
+      </div>
+    </>
+  );
+}

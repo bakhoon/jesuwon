@@ -1,0 +1,418 @@
+'use client';
+// 이 파일은 tools/convert-design.mjs 가 design/AdminServe.dc.html 에서 자동으로 만든 파일이에요.
+// 화면을 고치려면 design 파일을 고친 뒤 `npm run convert` 를 다시 돌리세요.
+import React, { useEffect } from 'react';
+import { A, DCLogic, asset, css, useDC } from '@/lib/dc';
+
+const STYLE = "\nbody{margin:0;background:#F3F5EF}\n*{box-sizing:border-box}\na{color:#2F5E17}\n.side-link{transition:background .15s,color .15s}\n.side-link:hover{background:rgba(255,255,255,0.08);color:#FFFFFF}\n.btn{transition:filter .15s,background .15s}\n.btn:hover{filter:brightness(0.95)}\n.btn-ghost:hover{background:#EEF6E3 !important}\n.row-hover:hover{background:#F8FBF4}\n.adm input[type=text],.adm input[type=email],.adm input[type=password],.adm input[type=number],.adm input[type=date],.adm input[type=search],.adm select,.adm textarea{font-family:inherit;font-size:15px;color:#1B2516;background:#FFFFFF;border:1px solid #C9D3BC;border-radius:10px}\n.adm input:focus,.adm select:focus,.adm textarea:focus{outline:none;border-color:#4F8F25;box-shadow:0 0 0 3px rgba(139,195,74,0.35)}\n.adm button:focus-visible,.adm a:focus-visible{outline:3px solid #8BC34A;outline-offset:2px}\n.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}\n.toast{animation:toastIn .25s ease}\n@keyframes toastIn{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}\n@media (prefers-reduced-motion: reduce){.toast{animation:none}}\n@media (max-width: 960px){.adm-side{display:none !important}.adm-main{padding:20px !important}}\n.adm button:disabled{opacity:.35;cursor:default}\n";
+
+class Component extends DCLogic {
+  flash(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast: '' }), 2200);
+  }
+  renderVals() {
+    const st = this.state || {};
+    const B = '/_blob/';
+    const R = (img, name, title, role, extra) => Object.assign({ img, name, title, role }, extra || {});
+    const SEED = {
+      staff: [
+        R('3ac2cef27d552c0c481c6366c94a5e4f', '윤성종', '목사', '담임목사', { phone: '484-686-1232', email: 'jesuwon@hotmail.com', bio: '목회학 석사 (MDiv) · Biblical Seminary\n신학 석사 (ThM in NT) · Calvin Theological Seminary\n박사 과정 수학 (PhD in NT) · The University of Pretoria\n목회학 박사 (DMin) · Golden Gate Seminary' }),
+        R('3064ccabb0ac64f09ed8c50c21ea72bd', '손석진', '목사', '목회 행정', { phone: '480-300-2500', email: '', bio: '' }),
+        R('51ad616bde4f34c956a1aac2f8f7be2d', '유선영', '사모', '주일학교 & 한글학교 디렉터', { phone: '484-686-1233', email: '', bio: '' })
+      ],
+      adult: [
+        R('d7af3bbec5f1dad50897ab01d5756f52', '홍종규', '집사', '마사이 목장'), R('5c548570b558147e47a3c7f3a6828b09', '이지훈', '집사', '안수집사 · 말레이 목장'),
+        R('0580d52768968767b6249b917d7a1ea8', '이재천', '집사', '멕시코 목장'), R('b2b4c93806e1e08cd7356451d1d996c0', '박용상', '집사', '미송게니 목장'),
+        R('5ebfc04f7bce98c5322eec1f6429543c', '손호남', '집사', '모로고로 목장'), R('9d10e1291bf444eda4e087a1b8bdafb9', '이호을', '집사', '바카무나 목장'),
+        R('54b998f60cf19d3b81bff5e70825562c', '송호종', '집사', '안수집사 · 스리랑카 목장'), R('1eaf874d0174ac4c21a59dfb549aa13d', '송승구', '집사', '안수집사 · 위촐 목장'),
+        R('3a5053a397211b43eb1bc3e600a8e701', '홍두진', '집사', '청원 목장'), R('6fe6f9886464a812f633d07cc228911a', '박유식', '장로', '시무장로 · 키징가 목장'),
+        R('90dceabd6aae2980c07bb8ca84ac1159', '김선배', '집사', '안수집사 · 킬로카 목장'), R('b5df98bb9c9ae3f24217ce97289e0871', '문해강', '집사', '안수집사 · 팡가웨 목장'),
+        R('27808fb66620198b5494bd1056bfa771', '서광운', '집사', '안수집사 · 싸포판 목장'), R('a1b7526b8aa3ae07972b29c4a4fc8b5a', '김수현', '집사', '탄자니아 초원'),
+        R('a03727613f5d6ff1579e24e9f3b3e090', '이종대', '집사', 'GST 목장'), R('e1aaf01b54a63ca671d0300eb5efd326', '조민구', '집사', '또날라 목장'),
+        R('b5c82cbe925bcf657ce2838a4d1c80c9', '이성한', '집사', '응게레 목장'), R('e612e968f74e81ea2b1600b6abf46c42', '윤산', '형제', '할리스코 목장'),
+        R('7ae808b9f62ce46d573ca9a97146d0c5', '원호연', '형제', '과달라 목장'), R('f0fcbfea81f3717f5442e88ffd7ee54c', '신주희', '자매', '챠팔라 목장')
+      ],
+      young: [
+        R('a1b7526b8aa3ae07972b29c4a4fc8b5a', '김수현', '집사', '담당 사역자, 공동체 초원장'), R('3cb44e8935be739697a4729f83295931', '이하람', '목동', '은도토 목장'),
+        R('eb47dc239639977c9ccd88a2452390d3', '김예은', '목동', '카니사 목장'), R('d1296104904aa4c01cd08213869e1c2e', '이승아', '목동', '우펜도 목장')
+      ],
+      youth: [
+        R('0a5d4c56f70f2b402bf914f41a14d916', '윤상혁', '디렉터', '주일예배 영어권 설교, 중고등부(인디오 목장)'), R('4246cac6fdab43c1573dbe2b17e256bf', '임수지', '집사', '중고등부(인디오 목장) 디렉터 & 교사'),
+        R('e612e968f74e81ea2b1600b6abf46c42', '윤산', '형제', '중고등부(인디오 목장) 디렉터 & 교사'), R('6bcbb1785ef1e1c53014ab2a5244756c', '유재엽', '형제', '중고등부(인디오 목장) 디렉터 & 교사')
+      ],
+      kids: [
+        R('51ad616bde4f34c956a1aac2f8f7be2d', '유선영', '사모', '주일학교 & 한글학교 디렉터'), R('d14faa4cb30b4bae070b70648eb27efc', '김보현', '집사', '주일학교 교사'),
+        R('0c97cb71929c5570d7cb076f8d3dfeb1', '나지연', '집사', '주일학교 교사'), R('7394edbe039cd935ca03716e0048756c', '이지희', '자매', '주일학교 교사')
+      ]
+    };
+    const LABEL = { staff: '교회 공동체', adult: '장년목장', young: '대학청년', youth: '중고등부', kids: '주일학교' };
+    const HINT = {
+      staff: '목사님, 사모님처럼 맨 위에 크게 나오는 분들이에요. 연락처와 약력도 넣을 수 있어요.',
+      adult: '장년목장 목자님들이에요. 카드 순서 그대로 사이트에 나와요.',
+      young: '대학청년 공동체 사역자와 목동들이에요.', youth: '중고등부 디렉터와 교사들이에요.', kids: '주일학교 디렉터와 교사들이에요.'
+    };
+    const data = st.data || SEED;
+    const tab = st.tab || 'staff';
+    const form = st.form || null;
+    const list = data[tab];
+    const setList = (nl) => this.setState({ data: Object.assign({}, data, { [tab]: nl }) });
+    const move = (i, d) => { const a = list.slice(); const j = i + d; if (j < 0 || j >= a.length) return; [a[i], a[j]] = [a[j], a[i]]; setList(a); };
+    const tabBase = 'flex-shrink: 0; min-height: 56px; padding: 0 16px; border: none; background: transparent; font-family: inherit; font-size: 15px; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px;';
+    const fset = (k) => (e) => this.setState({ form: Object.assign({}, form, { [k]: e.target.value }) });
+    const f = form ? Object.assign({}, form, { hasImg: !!form.img, noImg: !form.img, img: form.img ? B + form.img : '' }) : { name: '', title: '집사', role: '', phone: '', email: '', bio: '', hasImg: false, noImg: true, img: '' };
+    return {
+      tabs: Object.keys(LABEL).map((id) => ({ label: LABEL[id], n: String(data[id].length), selected: id === tab ? 'true' : 'false', pick: () => this.setState({ tab: id, form: null }),
+        style: tabBase + (id === tab ? ' color: #1F3B16; font-weight: 700; box-shadow: inset 0 -3px 0 #8BC34A;' : ' color: #56634F; font-weight: 500;') })),
+      tabHint: HINT[tab],
+      people: list.map((p, i) => ({
+        n: String(i + 1), img: B + p.img, name: p.name, title: p.title, role: p.role,
+        isFirst: i === 0, isLast: i === list.length - 1, up: () => move(i, -1), down: () => move(i, 1),
+        edit: () => this.setState({ form: Object.assign({ idx: i }, p) }),
+        remove: () => { setList(list.filter((_, j) => j !== i)); this.flash(p.name + ' ' + p.title + '님을 ' + LABEL[tab] + '에서 뺐어요'); }
+      })),
+      f, isStaff: tab === 'staff',
+      titleOpts: ['목사', '사모', '장로', '집사', '디렉터', '목동', '형제', '자매'],
+      panelOpen: !!form, panelTitle: form && form.idx !== undefined ? '정보 수정' : LABEL[tab] + '에 사람 추가',
+      openNew: () => this.setState({ form: { name: '', title: '집사', role: '', img: '', phone: '', email: '', bio: '' } }),
+      closePanel: () => this.setState({ form: null }),
+      onName: fset('name'), onTitle: fset('title'), onRole: fset('role'), onPhone: fset('phone'), onEmail: fset('email'), onBio: fset('bio'),
+      saveForm: (e) => {
+        if (e && e.preventDefault) e.preventDefault();
+        const p = Object.assign({}, form, { name: (form.name || '').trim() || '이름 없음' });
+        const idx = p.idx; delete p.idx;
+        if (idx !== undefined) setList(list.map((x, j) => (j === idx ? p : x))); else setList(list.concat([p]));
+        this.setState({ form: null });
+        this.flash(idx !== undefined ? '저장했어요' : p.name + '님을 추가했어요');
+      },
+      pendingCount: '3',
+      hasToast: !!st.toast, toast: st.toast || ''
+    };
+  }
+}
+
+export default function Page() {
+  const v = useDC(Component);
+  useEffect(() => { document.title = "관리자 · 섬기는 분들 관리"; }, []);
+  return (
+    <>
+      <style dangerouslySetInnerHTML={{ __html: STYLE }} />
+      <div className="adm" style={css("font-family: 'IBM Plex Sans KR', system-ui, sans-serif; color: #1B2516; background: #F3F5EF; min-height: 100vh; display: flex; word-break: keep-all")}>
+        <aside className="adm-side" aria-label="관리자 메뉴" style={css("width: 256px; flex-shrink: 0; background: #1F3B16; color: #FFFFFF; display: flex; flex-direction: column; padding: 24px 16px")}>
+          <A href="AdminHome.dc.html" style={css("display: flex; flex-direction: column; gap: 8px; padding: 0 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.12); text-decoration: none; color: #FFFFFF")}>
+            <img src={asset("/_blob/122f04b2c3721aa4a0194f5dc7c5de6e")} alt="예수원교회" style={css("height: 34px; width: auto; align-self: flex-start; display: block")} />
+            <span style={css("font-size: 13px; font-weight: 600; color: #8BC34A; letter-spacing: 0.06em")}>
+              {"ADMIN · 관리자"}
+            </span>
+          </A>
+          <nav style={css("flex: 1")}>
+            <div style={css("height: 14px")} />
+            <A className="side-link" href="AdminHome.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"대시보드"}
+              </span>
+            </A>
+            <p style={css("margin: 22px 0 8px; padding: 0 14px; font-size: 12px; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); font-weight: 700")}>
+              {"회원"}
+            </p>
+            <A className="side-link" href="AdminMembers.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"회원 관리"}
+              </span>
+              <span style={css("min-width: 22px; height: 22px; padding: 0 7px; border-radius: 999px; background: #F2C94C; color: #1B2516; font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center")}>
+                {v.pendingCount}
+              </span>
+            </A>
+            <p style={css("margin: 22px 0 8px; padding: 0 14px; font-size: 12px; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); font-weight: 700")}>
+              {"사이트"}
+            </p>
+            <A className="side-link" href="AdminHomepage.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"홈 화면 관리"}
+              </span>
+            </A>
+            <A className="side-link" href="AdminBanner.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"배너 관리"}
+              </span>
+            </A>
+            <A className="side-link" href="AdminPopup.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"팝업창 관리"}
+              </span>
+            </A>
+            <A className="side-link" href="AdminAbout.dc.html" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; color: rgba(255,255,255,0.82); font-weight: 500")}>
+              <span>
+                {"교회 소개 관리"}
+              </span>
+            </A>
+            <A className="side-link" href="AdminServe.dc.html" aria-current="page" style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; text-decoration: none; font-size: 15px; background: #8BC34A; color: #1B2516; font-weight: 700")}>
+              <span>
+                {"섬기는 분들 관리"}
+              </span>
+            </A>
+            <p style={css("margin: 22px 0 8px; padding: 0 14px; font-size: 12px; letter-spacing: 0.12em; color: rgba(255,255,255,0.5); font-weight: 700")}>
+              {"콘텐츠"}
+            </p>
+            <span style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 0 14px; font-size: 15px; color: rgba(255,255,255,0.45)")}>
+              <span>
+                {"설교 · 칼럼"}
+              </span>
+              <span style={css("font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25)")}>
+                {"준비 중"}
+              </span>
+            </span>
+            <span style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 0 14px; font-size: 15px; color: rgba(255,255,255,0.45)")}>
+              <span>
+                {"사진 · 동영상 앨범"}
+              </span>
+              <span style={css("font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25)")}>
+                {"준비 중"}
+              </span>
+            </span>
+            <span style={css("display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 0 14px; font-size: 15px; color: rgba(255,255,255,0.45)")}>
+              <span>
+                {"게시판 · 교회소식"}
+              </span>
+              <span style={css("font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.25)")}>
+                {"준비 중"}
+              </span>
+            </span>
+          </nav>
+          <A className="side-link" href="MemberMain.dc.html" style={css("display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 10px; color: rgba(255,255,255,0.82); text-decoration: none; font-size: 14px")}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+            {" 사이트로 돌아가기 "}
+          </A>
+        </aside>
+        <div style={css("flex: 1; min-width: 0; display: flex; flex-direction: column")}>
+          <header style={css("display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px 32px; background: #FFFFFF; border-bottom: 1px solid #E1E8D6")}>
+            <div>
+              <p style={css("margin: 0; font-size: 13px; color: #56634F")}>
+                {"관리자 › 사이트 › 섬기는 분들 관리"}
+              </p>
+              <h1 style={css("margin: 2px 0 0; font-family: 'Gowun Batang', serif; font-size: 26px; font-weight: 700")}>
+                {"섬기는 분들 관리"}
+              </h1>
+            </div>
+            <div style={css("display: flex; align-items: center; gap: 14px")}>
+              <span style={css("width: 38px; height: 38px; border-radius: 999px; background: #EEF6E3; color: #2F5E17; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px")} aria-hidden="true">
+                {"웹"}
+              </span>
+              <span style={css("display: flex; flex-direction: column; line-height: 1.3")}>
+                <b style={css("font-size: 14px")}>
+                  {"웹섬김이"}
+                </b>
+                <span style={css("font-size: 12px; color: #56634F")}>
+                  {"관리자"}
+                </span>
+              </span>
+              <A href="Main.dc.html" style={css("margin-left: 8px; min-height: 40px; display: inline-flex; align-items: center; padding: 0 14px; border-radius: 10px; border: 1px solid #D3DCC6; color: #1B2516; text-decoration: none; font-size: 14px")}>
+                {"로그아웃"}
+              </A>
+            </div>
+          </header>
+          <main className="adm-main" style={css("flex: 1; padding: 32px; max-width: 1240px; width: 100%")}>
+            <div style={css("background: #FFFFFF; border: 1px solid #E1E8D6; border-radius: 16px; overflow: hidden")}>
+              <div style={css("display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 0 20px; border-bottom: 1px solid #E1E8D6")}>
+                <div role="tablist" aria-label="공동체" style={css("display: flex; gap: 4px; overflow-x: auto")}>
+                  {(v.tabs || []).map((t, _i0) => (
+                    <React.Fragment key={_i0}>
+                      <button role="tab" aria-selected={t.selected} onClick={t.pick} style={css(t.style)}>
+                        {t.label}
+                        <span style={css("font-size: 12px; color: #56634F; font-weight: 500")}>
+                          {t.n}
+                        </span>
+                      </button>
+                    </React.Fragment>
+                  ))}
+                </div>
+                <div style={css("display: flex; gap: 8px; padding: 10px 0")}>
+                  <A href="Serve.dc.html" className="btn-ghost" style={css("min-height: 44px; padding: 0 18px; border: 1px solid #D3DCC6; border-radius: 10px; background: #FFFFFF; color: #1B2516; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; text-decoration: none")}>
+                    {"사이트에서 보기"}
+                  </A>
+                  <button className="btn" onClick={v.openNew} style={css("min-height: 44px; padding: 0 18px; border: none; border-radius: 10px; background: #8BC34A; color: #1B2516; font-family: inherit; font-size: 14px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px")}>
+                    {"+ 사람 추가"}
+                  </button>
+                </div>
+              </div>
+              <div style={css("padding: 24px; background: #F8FAF5")}>
+                <p style={css("margin: 0 0 18px; font-size: 14px; color: #56634F")}>
+                  {v.tabHint}
+                </p>
+                <div style={css("display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px")}>
+                  {(v.people || []).map((p, _i1) => (
+                    <React.Fragment key={_i1}>
+                      <article style={css("background: #FFFFFF; border: 1px solid #E1E8D6; border-radius: 16px; overflow: hidden; display: flex; flex-direction: column")}>
+                        <div style={css("position: relative; aspect-ratio: 4 / 5; background: #DDE7D0")}>
+                          <img src={asset(p.img)} alt={p.name} style={css("width: 100%; height: 100%; object-fit: cover; display: block")} />
+                          <span style={css("position: absolute; left: 8px; top: 8px; min-width: 26px; height: 26px; padding: 0 7px; border-radius: 999px; background: rgba(31,59,22,0.85); color: #FFFFFF; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center")}>
+                            {p.n}
+                          </span>
+                        </div>
+                        <div style={css("padding: 12px 14px; flex: 1")}>
+                          <p style={css("margin: 0; font-size: 16px; font-weight: 700")}>
+                            {p.name}{" "}
+                            <span style={css("font-size: 13px; font-weight: 500; color: #56634F")}>
+                              {p.title}
+                            </span>
+                          </p>
+                          <p style={css("margin: 4px 0 0; font-size: 13px; color: #2E3A28; line-height: 1.5")}>
+                            {p.role}
+                          </p>
+                        </div>
+                        <div style={css("display: flex; gap: 6px; padding: 0 14px 14px")}>
+                          <button aria-label={`${p.name ?? ""} 앞으로`} disabled={!!(p.isFirst) && p.isFirst !== 'false'} onClick={p.up} style={css("width: 32px; height: 32px; border-radius: 8px; border: 1px solid #D3DCC6; background: #FFFFFF; color: #1B2516; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0")}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <path d="M15 6l-6 6 6 6" />
+                            </svg>
+                          </button>
+                          <button aria-label={`${p.name ?? ""} 뒤로`} disabled={!!(p.isLast) && p.isLast !== 'false'} onClick={p.down} style={css("width: 32px; height: 32px; border-radius: 8px; border: 1px solid #D3DCC6; background: #FFFFFF; color: #1B2516; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0")}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                              <path d="M9 6l6 6-6 6" />
+                            </svg>
+                          </button>
+                          <span style={css("flex: 1")} />
+                          <button className="btn-ghost" onClick={p.edit} style={css("min-height: 32px; padding: 0 10px; border-radius: 8px; border: 1px solid #D3DCC6; background: #FFFFFF; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer")}>
+                            {"수정"}
+                          </button>
+                          <button aria-label={`${p.name ?? ""} 삭제`} onClick={p.remove} style={css("width: 32px; height: 32px; border-radius: 8px; border: 1px solid #D3DCC6; background: #FFFFFF; color: #1B2516; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; color: #B3261E; border-color: #E8B4AE")}>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                              <path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" />
+                            </svg>
+                          </button>
+                        </div>
+                      </article>
+                    </React.Fragment>
+                  ))}
+                </div>
+              </div>
+            </div>
+            {(v.panelOpen) ? (
+              <>
+              <div style={css("position: fixed; inset: 0; z-index: 40; background: rgba(14,24,10,0.45); display: flex; justify-content: flex-end")}>
+                <form role="dialog" aria-modal="true" aria-labelledby="sv-t" onSubmit={v.saveForm} style={css("width: 100%; max-width: 480px; height: 100%; overflow-y: auto; background: #FFFFFF; padding: 28px; display: flex; flex-direction: column; gap: 16px")}>
+                  <div style={css("display: flex; align-items: center; justify-content: space-between")}>
+                    <h2 id="sv-t" style={css("margin: 0; font-size: 20px; font-weight: 700")}>
+                      {v.panelTitle}
+                    </h2>
+                    <button type="button" aria-label="닫기" onClick={v.closePanel} style={css("width: 32px; height: 32px; border-radius: 8px; border: 1px solid #D3DCC6; background: #FFFFFF; color: #1B2516; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; width: 40px; height: 40px")}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+                        <path d="M6 6l12 12M18 6L6 18" />
+                      </svg>
+                    </button>
+                  </div>
+                  <div style={css("display: flex; gap: 16px; align-items: center")}>
+                    <div style={css("width: 112px; aspect-ratio: 4 / 5; border-radius: 12px; border: 2px dashed #C9D3BC; background: #F6F9F1; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center")}>
+                      {(v.f.hasImg) ? (
+                        <>
+                        <img src={asset(v.f.img)} alt="" style={css("width: 100%; height: 100%; object-fit: cover")} />
+                        </>
+                      ) : null}
+                      {(v.f.noImg) ? (
+                        <>
+                        <span style={css("font-size: 13px; color: #56634F; text-align: center; padding: 8px")}>
+                          {"사진 없음"}
+                        </span>
+                        </>
+                      ) : null}
+                    </div>
+                    <div style={css("display: flex; flex-direction: column; gap: 6px")}>
+                      <span style={css("min-height: 44px; padding: 0 18px; border: 1px solid #D3DCC6; border-radius: 10px; background: #FFFFFF; color: #1B2516; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; display: inline-flex")}>
+                        {"사진 선택"}
+                      </span>
+                      <span style={css("font-size: 12px; color: #56634F")}>
+                        {"세로 사진 (4:5) 권장"}
+                      </span>
+                    </div>
+                  </div>
+                  <div style={css("display: grid; grid-template-columns: 1fr 140px; gap: 12px")}>
+                    <div>
+                      <label htmlFor="sv-n" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                        {"이름"}
+                      </label>
+                      <input id="sv-n" type="text" value={v.f.name ?? ''} onChange={v.onName} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                    </div>
+                    <div>
+                      <label htmlFor="sv-ti" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                        {"직분"}
+                      </label>
+                      <select id="sv-ti" value={v.f.title ?? ''} onChange={v.onTitle} style={css("min-height: 44px; padding: 0 14px; width: 100%")}>
+                        {(v.titleOpts || []).map((o, _i2) => (
+                          <React.Fragment key={_i2}>
+                            <option value={o}>
+                              {o}
+                            </option>
+                          </React.Fragment>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label htmlFor="sv-r" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                      {"맡은 일"}
+                    </label>
+                    <input id="sv-r" type="text" placeholder="예: 할리스코 목장, 주일학교 교사" value={v.f.role ?? ''} onChange={v.onRole} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                  </div>
+                  {(v.isStaff) ? (
+                    <>
+                    <div style={css("display: flex; flex-direction: column; gap: 16px")}>
+                      <div style={css("display: grid; grid-template-columns: 1fr 1fr; gap: 12px")}>
+                        <div>
+                          <label htmlFor="sv-p" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                            {"전화"}
+                          </label>
+                          <input id="sv-p" type="text" value={v.f.phone ?? ''} onChange={v.onPhone} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                        </div>
+                        <div>
+                          <label htmlFor="sv-e" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                            {"이메일"}
+                          </label>
+                          <input id="sv-e" type="text" value={v.f.email ?? ''} onChange={v.onEmail} style={css("min-height: 44px; padding: 0 14px; width: 100%")} />
+                        </div>
+                      </div>
+                      <div>
+                        <label htmlFor="sv-b" style={css("display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600")}>
+                          {"학력 · 약력 "}
+                          <span style={css("font-weight: 400; color: #56634F")}>
+                            {"(한 줄에 하나씩)"}
+                          </span>
+                        </label>
+                        <textarea id="sv-b" rows="5" value={v.f.bio ?? ''} onChange={v.onBio} style={css("width: 100%; padding: 12px 14px; line-height: 1.7; resize: vertical")} />
+                      </div>
+                    </div>
+                    </>
+                  ) : null}
+                  <p style={css("margin: 0; padding: 12px 14px; border-radius: 10px; background: #F6F9F1; font-size: 13px; color: #56634F; line-height: 1.6")}>
+                    {"같은 분이 여러 공동체에서 섬기면 각 탭에 따로 추가하면 돼요. (예: 윤산 형제는 장년목장과 중고등부 둘 다)"}
+                  </p>
+                  <div style={css("display: flex; justify-content: flex-end; gap: 8px; margin-top: auto; padding-top: 8px")}>
+                    <button type="button" onClick={v.closePanel} style={css("min-height: 44px; padding: 0 18px; border: 1px solid #D3DCC6; border-radius: 10px; background: #FFFFFF; color: #1B2516; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px")}>
+                      {"취소"}
+                    </button>
+                    <button type="submit" className="btn" style={css("min-height: 44px; padding: 0 18px; border: none; border-radius: 10px; background: #1F3B16; color: #FFFFFF; font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px")}>
+                      {"저장"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+              </>
+            ) : null}
+          </main>
+        </div>
+        {(v.hasToast) ? (
+          <>
+          <div className="toast" role="status" style={css("position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: 10px; padding: 14px 20px; border-radius: 12px; background: #1F3B16; color: #FFFFFF; font-size: 15px; box-shadow: 0 12px 30px rgba(14,24,10,0.3)")}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8BC34A" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M5 12l5 5 9-10" />
+            </svg>
+            {" "}{v.toast}{" "}
+          </div>
+          </>
+        ) : null}
+      </div>
+    </>
+  );
+}
