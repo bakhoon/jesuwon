@@ -3,11 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "npx serve out",
-    "convert": "node tools/convert-design.mjs",
-    "sync": "node tools/sync-drive.mjs"
+    "start": "node tools/sync-drive.mjs --soft && next dev",
+    "dev": "node tools/sync-drive.mjs --soft && next dev",
+    "build": "node tools/sync-drive.mjs --soft && next build",
+    "preview": "npm run build && npx serve out",
+    "sync": "node tools/sync-drive.mjs",
+    "convert": "node tools/convert-design.mjs"
   },
   "dependencies": {
     "next": "15.5.4",

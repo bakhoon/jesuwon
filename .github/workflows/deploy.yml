@@ -27,14 +27,10 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Sync banners from Google Drive
-        run: npm run sync
-        continue-on-error: true   # 드라이브가 안 되어도 사이트 배포는 계속
-        env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-      - name: Build
+      - name: Build (드라이브 배너 동기화 포함)
         run: npm run build
         env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           # https://<계정>.github.io/<저장소이름>/ 에 맞춰 경로를 붙여요
           NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
       - run: touch out/.nojekyll

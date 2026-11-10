@@ -18,8 +18,12 @@ Next.js(React)로 만든 예수원교회 홈페이지예요. 지금은 **외부 
 
 ```bash
 npm install
-npm run dev
+npm run start
 ```
+
+`npm run start` 하나로 구글 드라이브 배너 사진을 먼저 가져온 다음 사이트를 띄워요.
+드라이브 사진까지 보려면 `.env.local.example` 을 `.env.local` 로 복사하고 `GOOGLE_API_KEY=` 뒤에 키를 넣으세요.
+(키가 없어도 사이트는 기본 사진 한 장으로 잘 떠요.)
 
 http://localhost:3000 을 열면 돼요.
 
@@ -40,7 +44,7 @@ http://localhost:3000 을 열면 돼요.
 - **반영 시간:** 매일 새벽 한 번 자동으로 가져와요. 바로 반영하려면 GitHub 저장소 **Actions › Deploy to GitHub Pages › Run workflow** 를 누르세요 (3~5분).
 - **원본 그대로:** 큰 원본을 넣어도 자동으로 가로 1920px JPG로 줄여서 올려요.
 
-처음 한 번 설정: GitHub 저장소 **Settings › Secrets and variables › Actions** 에 `GOOGLE_API_KEY` 를 추가해야 해요.
+처음 한 번 설정: 내 컴퓨터에서는 `.env.local` 에, GitHub 배포용으로는 저장소 **Settings › Secrets and variables › Actions** 에 `GOOGLE_API_KEY` 를 추가해야 해요.
 키가 없으면 동기화를 건너뛰고 기본 사진 한 장을 보여줘요.
 
 ## 폴더 구조

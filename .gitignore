@@ -42,3 +42,5 @@ next-env.d.ts
 
 # 드라이브에서 내려받은 사진 (빌드할 때마다 새로 받음)
 /public/drive/
+/data/banners.json
+!.env.local.example

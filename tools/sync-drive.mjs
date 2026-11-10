@@ -11,20 +11,43 @@
 //   BANNER_FOLDER_ID : (선택) 폴더 ID. 없으면 아래 기본값
 //
 // 폴더는 "링크가 있는 모든 사용자: 뷰어" 로 공유되어 있어야 해요.
-// 사용법: GOOGLE_API_KEY=... node tools/sync-drive.mjs
+// 사용법: npm run start (또는 npm run dev / npm run build) 할 때 자동으로 먼저 실행돼요.
+//         키는 .env.local 파일의 GOOGLE_API_KEY=... 에서 읽어요.
+// --soft : 키가 없거나 실패해도 멈추지 않고, 기존(또는 빈) 목록으로 계속 진행
 import fs from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const SOFT = process.argv.includes('--soft');
+
+// .env.local 읽기 (이미 환경변수에 있으면 그게 우선)
+for (const f of ['.env.local', '.env']) {
+  const p = path.join(ROOT, f);
+  if (!fs.existsSync(p)) continue;
+  for (const line of fs.readFileSync(p, 'utf8').split(/\r?\n/)) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+    if (m && !(m[1] in process.env)) process.env[m[1]] = m[2].replace(/^['"]|['"]$/g, '');
+  }
+}
+
 const KEY = process.env.GOOGLE_API_KEY;
 const FOLDER = process.env.BANNER_FOLDER_ID || '15E4PK8IUAO2puIb1HgPRPeORSRlrlpn2';
 const API = process.env.DRIVE_API_BASE || 'https://www.googleapis.com/drive/v3';
 const OUT_DIR = path.join(ROOT, 'public/drive/banner');
 const JSON_PATH = path.join(ROOT, 'data/banners.json');
 
+// 목록 파일이 없으면 빈 목록을 만들어 둬요 (사이트는 기본 사진 한 장을 보여줌)
+function ensureJson() {
+  if (!fs.existsSync(JSON_PATH)) {
+    fs.mkdirSync(path.dirname(JSON_PATH), { recursive: true });
+    fs.writeFileSync(JSON_PATH, JSON.stringify({ updatedAt: null, folderId: null, items: [] }, null, 2) + '\n');
+  }
+}
+
 if (!KEY) {
-  console.log('GOOGLE_API_KEY 가 없어서 드라이브 동기화를 건너뛰어요. (기존 data/banners.json 사용)');
+  console.log('[드라이브] GOOGLE_API_KEY 가 없어서 배너 동기화를 건너뛰어요. (.env.local 에 넣으면 동작해요)');
+  ensureJson();
   process.exit(0);
 }
 
@@ -68,7 +91,7 @@ async function main() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   const files = await listFolder(FOLDER);
-  console.log(`폴더에서 ${files.length}개 찾음`);
+  console.log(`[드라이브] 폴더에서 ${files.length}개 찾음`);
 
   const items = [];
   for (const f of files) {
@@ -105,10 +128,11 @@ async function main() {
   }
 
   fs.writeFileSync(JSON_PATH, JSON.stringify({ updatedAt: new Date().toISOString(), folderId: FOLDER, items }, null, 2) + '\n');
-  console.log(`data/banners.json 에 ${items.length}장 저장`);
+  console.log(`[드라이브] 배너 ${items.length}장 준비 완료`);
 }
 
 main().catch((e) => {
-  console.error('드라이브 동기화 실패:', e.message);
-  process.exit(1);
+  console.error('[드라이브] 배너 동기화 실패:', e.message);
+  ensureJson();
+  process.exit(SOFT ? 0 : 1);
 });
