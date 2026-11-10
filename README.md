@@ -79,6 +79,17 @@ public/img/             사진 파일
 
 `app/` 파일을 직접 고치면 다음 변환 때 덮어써지니 주의하세요.
 
+## 작업 방식 (PR)
+
+`main` 에 바로 올리지 않고, 작업마다 브랜치를 만들어 PR 로 합쳐요.
+
+1. 브랜치 만들기: `git checkout -b feature/작업이름`
+2. 작업하고 commit, `git push -u origin feature/작업이름`
+3. GitHub 에서 PR 열기 → **PR build check** 가 초록불인지 확인
+4. 확인되면 **Merge** → `main` 에 합쳐지는 순간 자동 배포
+
+`main` 에 합쳐진 뒤 내 컴퓨터는 `git checkout main && git pull` 로 최신으로 맞춰요.
+
 ## 다음 단계
 
 1. 공통 부분(상단 메뉴, 푸터)을 컴포넌트로 빼고, 샘플 데이터를 `data/` 파일로 분리
