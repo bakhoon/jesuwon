@@ -1,0 +1,22 @@
+# PR 을 열거나 PR 에 커밋을 올리면 빌드가 되는지 먼저 확인해요. (배포는 안 해요)
+name: PR build check
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          # PR 확인용이라 드라이브 키 없이 빌드해요 (배너는 기본 사진 한 장)
+          NEXT_PUBLIC_BASE_PATH: /${{ github.event.repository.name }}
