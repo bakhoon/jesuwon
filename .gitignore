@@ -44,3 +44,8 @@ next-env.d.ts
 /public/drive/
 /data/banners.json
 !.env.local.example
+
+# 서비스 계정 키 (절대 GitHub 에 올리지 않기)
+/secrets/
+*service-account*.json
+!/secrets/.gitkeep

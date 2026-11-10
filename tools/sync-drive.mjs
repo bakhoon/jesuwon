@@ -7,7 +7,11 @@
 //   4. data/banners.json 을 새로 써요
 //
 // 필요한 것
-//   GOOGLE_API_KEY   : Google Cloud 에서 만든 API 키 (Drive API 사용 설정)
+//   둘 중 하나:
+//   GOOGLE_API_KEY              : API 키. 폴더가 "링크가 있는 모든 사용자" 공개일 때만 동작
+//   GOOGLE_SERVICE_ACCOUNT_FILE : 서비스 계정 JSON 키 파일 경로. 폴더를 비공개로 두고
+//                                 서비스 계정 이메일에만 "뷰어"로 공유했을 때 사용
+//   (GitHub Actions 에서는 파일 대신 GOOGLE_SERVICE_ACCOUNT_JSON 에 JSON 내용을 통째로)
 //   BANNER_FOLDER_ID : (선택) 폴더 ID. 없으면 아래 기본값
 //
 // 폴더는 "링크가 있는 모든 사용자: 뷰어" 로 공유되어 있어야 해요.
@@ -17,6 +21,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 import sharp from 'sharp';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 윈도우에서도 맞는 경로
@@ -33,6 +38,37 @@ for (const f of ['.env.local', '.env']) {
 }
 
 const KEY = process.env.GOOGLE_API_KEY;
+
+// 서비스 계정 (비공개 폴더용)
+function loadServiceAccount() {
+  if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) return JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+  const f = process.env.GOOGLE_SERVICE_ACCOUNT_FILE;
+  if (f) return JSON.parse(fs.readFileSync(path.resolve(ROOT, f), 'utf8'));
+  return null;
+}
+const SA = loadServiceAccount();
+let TOKEN = null;
+
+// 서비스 계정 → 1시간짜리 접근 토큰 (라이브러리 없이 JWT 직접 서명)
+async function getToken() {
+  const now = Math.floor(Date.now() / 1000);
+  const b64 = (o) => Buffer.from(JSON.stringify(o)).toString('base64url');
+  const unsigned = `${b64({ alg: 'RS256', typ: 'JWT' })}.${b64({
+    iss: SA.client_email, scope: 'https://www.googleapis.com/auth/drive.readonly',
+    aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600,
+  })}`;
+  const sig = crypto.sign('RSA-SHA256', Buffer.from(unsigned), SA.private_key).toString('base64url');
+  const res = await fetch(process.env.GOOGLE_TOKEN_URL || 'https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: `${unsigned}.${sig}` }),
+  });
+  if (!res.ok) throw new Error(`서비스 계정 토큰 발급 실패: ${res.status} ${(await res.text()).slice(0, 300)}`);
+  return (await res.json()).access_token;
+}
+
+// 요청마다 붙일 인증: 서비스 계정이면 토큰, 아니면 API 키
+const auth = () => (SA ? {} : { key: KEY });
 const FOLDER = process.env.BANNER_FOLDER_ID || '15E4PK8IUAO2puIb1HgPRPeORSRlrlpn2';
 const API = process.env.DRIVE_API_BASE || 'https://www.googleapis.com/drive/v3';
 const OUT_DIR = path.join(ROOT, 'public/drive/banner');
@@ -46,17 +82,17 @@ function ensureJson() {
   }
 }
 
-if (!KEY) {
-  console.log('[드라이브] GOOGLE_API_KEY 가 없어서 배너 동기화를 건너뛰어요. (.env.local 에 넣으면 동작해요)');
+if (!KEY && !SA) {
+  console.log('[드라이브] GOOGLE_API_KEY / 서비스 계정이 없어서 배너 동기화를 건너뛰어요. (.env.local 에 넣으면 동작해요)');
   ensureJson();
   process.exit(0);
 }
 
 async function get(url, as = 'json') {
-  const res = await fetch(url);
+  const res = await fetch(url, TOKEN ? { headers: { Authorization: `Bearer ${TOKEN}` } } : undefined);
   if (!res.ok) {
     const body = await res.text().catch(() => '');
-    throw new Error(`${res.status} ${res.statusText} ← ${url.replace(KEY, '***')}\n${body.slice(0, 400)}`);
+    throw new Error(`${res.status} ${res.statusText} ← ${(KEY ? url.replace(KEY, '***') : url)}\n${body.slice(0, 400)}`);
   }
   return as === 'json' ? res.json() : Buffer.from(await res.arrayBuffer());
 }
@@ -68,7 +104,7 @@ async function listFolder(folderId) {
   let pageToken = '';
   do {
     const params = new URLSearchParams({
-      q, fields, orderBy: 'name', pageSize: '100', key: KEY,
+      q, fields, orderBy: 'name', pageSize: '100', ...auth(),
       supportsAllDrives: 'true', includeItemsFromAllDrives: 'true',
       ...(pageToken ? { pageToken } : {}),
     });
@@ -91,6 +127,10 @@ async function main() {
   const prevById = Object.fromEntries((prev.items || []).map((it) => [it.id, it]));
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
+  if (SA) {
+    TOKEN = await getToken();
+    console.log(`[드라이브] 서비스 계정으로 접속: ${SA.client_email}`);
+  }
   const files = await listFolder(FOLDER);
   console.log(`[드라이브] 폴더에서 ${files.length}개 찾음`);
 
@@ -109,7 +149,7 @@ async function main() {
       ({ w, h } = old);
       console.log(`  = ${f.name} (변경 없음)`);
     } else {
-      const params = new URLSearchParams({ alt: 'media', key: KEY, supportsAllDrives: 'true' });
+      const params = new URLSearchParams({ alt: 'media', ...auth(), supportsAllDrives: 'true' });
       const buf = await get(`${API}/files/${id}?${params}`, 'buffer');
       const out = await sharp(buf).rotate().resize({ width: 1920, withoutEnlargement: true }).jpeg({ quality: 80, mozjpeg: true }).toBuffer({ resolveWithObject: true });
       fs.writeFileSync(file, out.data);

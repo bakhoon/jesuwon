@@ -44,6 +44,15 @@ http://localhost:3000 을 열면 돼요.
 - **반영 시간:** 매일 새벽 한 번 자동으로 가져와요. 바로 반영하려면 GitHub 저장소 **Actions › Deploy to GitHub Pages › Run workflow** 를 누르세요 (3~5분).
 - **원본 그대로:** 큰 원본을 넣어도 자동으로 가로 1920px JPG로 줄여서 올려요.
 
+폴더 공유 방식에 따라 열쇠가 달라요.
+
+| 폴더 공유 | 필요한 것 | GitHub Secret 이름 |
+|---|---|---|
+| 링크가 있는 모든 사용자 (공개) | API 키 | `GOOGLE_API_KEY` |
+| 비공개 + 서비스 계정 이메일만 뷰어 | 서비스 계정 JSON 키 | `GOOGLE_SERVICE_ACCOUNT_JSON` (JSON 내용 통째로) |
+
+API 키는 "누가 만든 키인지"와 상관없이 공개 파일만 읽을 수 있어요. 비공개 폴더는 서비스 계정이 필요해요.
+
 처음 한 번 설정: 내 컴퓨터에서는 `.env.local` 에, GitHub 배포용으로는 저장소 **Settings › Secrets and variables › Actions** 에 `GOOGLE_API_KEY` 를 추가해야 해요.
 키가 없으면 동기화를 건너뛰고 기본 사진 한 장을 보여줘요.
 
