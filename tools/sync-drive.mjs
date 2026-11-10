@@ -16,9 +16,10 @@
 // --soft : 키가 없거나 실패해도 멈추지 않고, 기존(또는 빈) 목록으로 계속 진행
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 윈도우에서도 맞는 경로
 const SOFT = process.argv.includes('--soft');
 
 // .env.local 읽기 (이미 환경변수에 있으면 그게 우선)

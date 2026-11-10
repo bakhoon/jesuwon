@@ -3,9 +3,10 @@
 // 디자인을 고친 뒤 다시 돌리면 페이지가 새로 만들어져요.
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { parseDocument } from 'htmlparser2';
 
-const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'); // 윈도우에서도 맞는 경로
 const DESIGN = path.join(ROOT, 'design');
 
 const PAGES = {
