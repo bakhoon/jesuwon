@@ -43,7 +43,14 @@ const KEY = process.env.GOOGLE_API_KEY;
 function loadServiceAccount() {
   if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON) return JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
   const f = process.env.GOOGLE_SERVICE_ACCOUNT_FILE;
-  if (f) return JSON.parse(fs.readFileSync(path.resolve(ROOT, f), 'utf8'));
+  if (f) {
+    const p = path.resolve(ROOT, f);
+    if (!fs.existsSync(p)) {
+      console.log(`[드라이브] 서비스 계정 키 파일이 없어요: ${p} (API 키가 있으면 API 키로 진행해요)`);
+      return null;
+    }
+    return JSON.parse(fs.readFileSync(p, 'utf8'));
+  }
   return null;
 }
 const SA = loadServiceAccount();
@@ -133,6 +140,14 @@ async function main() {
   }
   const files = await listFolder(FOLDER);
   console.log(`[드라이브] 폴더에서 ${files.length}개 찾음`);
+
+  // 0개면 대부분 "폴더가 비공개로 바뀌어 이 열쇠로는 안 보임" 이에요.
+  // 이때 기존 배너를 지우면 홈이 텅 비니까, 지우지 않고 그대로 둬요.
+  if (files.length === 0 && (prev.items || []).length > 0) {
+    console.log('[드라이브] ⚠ 폴더가 비어 보여요. 폴더 공유가 바뀌었거나 열쇠(API 키/서비스 계정)에 권한이 없을 수 있어요.');
+    console.log(`[드라이브]   기존 배너 ${prev.items.length}장을 그대로 유지할게요. 정말 다 내리려면 data/banners.json 을 지우고 다시 실행하세요.`);
+    return;
+  }
 
   const items = [];
   for (const f of files) {
