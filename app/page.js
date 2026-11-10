@@ -3,13 +3,28 @@
 // 화면을 고치려면 design 파일을 고친 뒤 `npm run convert` 를 다시 돌리세요.
 import React, { useEffect } from 'react';
 import { A, DCLogic, asset, css, useDC } from '@/lib/dc';
+import { BANNERS } from '@/lib/banners';
 
 const STYLE = "\nbody{margin:0;background:#F6F9F1}\na{color:#2F5E17}a:hover{color:#1F3B16}\n.nav-burger{display:none !important}\n.util-bar,.site-header{width:100%;max-width:1280px;margin-left:auto !important;margin-right:auto !important;box-sizing:border-box}\nheader{flex-wrap:nowrap !important}\n.nav-links{white-space:nowrap;flex-shrink:0}\n@media (max-width: 1320px){.nav-links{gap:20px !important;font-size:16px !important}}\n@media (max-width: 1100px){.nav-links{gap:14px !important;font-size:15px !important}}\n.nav-dropdown{visibility:hidden;opacity:0;clip-path:inset(0 -40px 100% -40px);transition:clip-path .35s cubic-bezier(.2,.7,.2,1),opacity .2s ease,visibility 0s linear .35s}\n.nav-dropdown a{opacity:0;transform:translateY(-6px);transition:opacity .25s ease,transform .25s ease,background .15s}\n.nav-item:hover .nav-dropdown,.nav-item:focus-within .nav-dropdown{visibility:visible;opacity:1;clip-path:inset(0 -40px -60px -40px);transition:clip-path .35s cubic-bezier(.2,.7,.2,1),opacity .2s ease,visibility 0s}\n.nav-item:hover .nav-dropdown a,.nav-item:focus-within .nav-dropdown a{opacity:1;transform:none}\n.nav-item:hover .nav-dropdown a:nth-child(2){transition-delay:.04s}\n.nav-item:hover .nav-dropdown a:nth-child(3){transition-delay:.08s}\n.nav-item:hover .nav-dropdown a:nth-child(4){transition-delay:.12s}\n.nav-item:hover .nav-dropdown a:nth-child(5){transition-delay:.16s}\n.nav-item:hover .nav-dropdown a:nth-child(6){transition-delay:.20s}\n.nav-item:hover .nav-dropdown a:nth-child(7){transition-delay:.24s}\n.nav-item:hover .nav-dropdown a:nth-child(8){transition-delay:.28s}\n.sub-list{max-height:0;overflow:hidden;opacity:0;transition:max-height .35s cubic-bezier(.2,.7,.2,1),opacity .25s ease,margin .35s}\n.sub-group.open .sub-list,.sub-group:focus-within .sub-list{max-height:260px;opacity:1;margin-top:2px !important;margin-bottom:6px !important}\n.sub-group.open .sub-caret,.sub-group:focus-within .sub-caret{transform:rotate(180deg)}\n.sub-group.open > a{background:#EEF6E3;color:#1F3B16}\n.sub-list a:hover{background:#DCEEC6 !important}\n@media (prefers-reduced-motion: reduce){.nav-dropdown,.nav-dropdown a,.sub-list{transition:none !important}}\n.nav-item:hover .nav-caret{transform:rotate(180deg)}\n.nav-dropdown a:hover{background:#EEF6E3;color:#1F3B16}\n@media (max-width: 860px){\n  .nav-links{display:none !important}\n  .nav-burger{display:flex !important}\n  .gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}\n  .hero-title{font-size:38px !important}\n  .section-title{font-size:30px !important}\n  .quick-wrap{margin-top:-40px !important}\n}\n@media (max-width: 1000px){.quick-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important}}\n@media (max-width: 560px){.quick-grid{grid-template-columns:minmax(0,1fr) !important}}\n";
 
 class Component extends DCLogic {
   renderVals() {
     const openSub = this.state ? this.state.openSub : null;
+    // 홈 슬라이더: 구글 드라이브 current_banner 폴더 사진 (lib/banners.js)
+    const total = BANNERS.length;
+    const cur = ((this.state && this.state.slide) || 0) % total;
+    const go = (d) => this.setState({ slide: (cur + d + total) % total });
+    if (typeof window !== 'undefined' && total > 1 && !this._timer) {
+      this._timer = setInterval(() => this.setState((s) => ({ slide: ((s.slide || 0) + 1) % total })), 6000);
+    }
+    const pad = (n) => String(n).padStart(2, '0');
+    const slideVals = {
+      slides: BANNERS.map((b, i) => ({ src: b.src, alt: b.alt, opacity: i === cur ? '1' : '0', hidden: i === cur ? 'false' : 'true' })),
+      prevSlide: () => go(-1), nextSlide: () => go(1),
+      slideNo: pad(cur + 1), slideTotal: pad(total), slideBar: Math.round(((cur + 1) / total) * 120) + 'px',
+    };
     return {
+      ...slideVals,
       primary: this.props.primary ?? '#8BC34A',
       aboutCls: openSub === 'about' ? 'open' : '',
       serveCls: openSub === 'serve' ? 'open' : '',
@@ -28,7 +43,11 @@ export default function Page() {
       <style dangerouslySetInnerHTML={{ __html: STYLE }} />
       <div style={css("font-family: 'IBM Plex Sans KR', system-ui, sans-serif; color: #1B2516; background: #F6F9F1; min-height: 100vh; word-break: keep-all")}>
         <section style={css("position: relative; min-height: 700px; color: #FFFFFF; display: flex; flex-direction: column; overflow: hidden; background: #1F3B16")}>
-          <img src={asset("/_blob/c03a3e2bcf9d8de53ca200225920f242")} alt="예수원교회 청년부 단체 사진" style={css("position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%")} />
+          {(v.slides || []).map((s, _i0) => (
+            <React.Fragment key={_i0}>
+              <img src={asset(s.src)} alt={s.alt} aria-hidden={s.hidden} style={css(`position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; transition: opacity .9s ease; opacity: ${s.opacity ?? ""}`)} />
+            </React.Fragment>
+          ))}
           <div style={css("position: absolute; inset: 0; background: linear-gradient(180deg, rgba(14,24,10,0.65) 0%, rgba(14,24,10,0.10) 30%, rgba(14,24,10,0.05) 70%, rgba(14,24,10,0.45) 100%)")} />
           <div className="util-bar" style={css("position: relative; display: flex; justify-content: flex-end; gap: 20px; padding: 14px 40px 0; font-size: 13px")}>
             <A href="#" style={css("color: rgba(255,255,255,0.9); text-decoration: none")}>
@@ -189,27 +208,27 @@ export default function Page() {
               {"예수원교회"}
             </h1>
             <div style={css("display: flex; align-items: center; gap: 16px")}>
-              <button aria-label="이전 사진" style={css("width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.6); background: rgba(0,0,0,0.15); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer")}>
+              <button aria-label="이전 사진" onClick={v.prevSlide} style={css("width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.6); background: rgba(0,0,0,0.15); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer")}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <path d="M15 6l-6 6 6 6" />
                 </svg>
               </button>
               <span style={css("font-size: 14px; letter-spacing: 0.1em")}>
                 <b>
-                  {"01"}
+                  {v.slideNo}
                 </b>
 {" "}
                 <span style={css("opacity: 0.7")}>
-                  {"/ 04"}
+                  {"/ "}{v.slideTotal}
                 </span>
               </span>
-              <button aria-label="다음 사진" style={css("width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.6); background: rgba(0,0,0,0.15); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer")}>
+              <button aria-label="다음 사진" onClick={v.nextSlide} style={css("width: 44px; height: 44px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.6); background: rgba(0,0,0,0.15); color: #FFFFFF; display: flex; align-items: center; justify-content: center; cursor: pointer")}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <path d="M9 6l6 6-6 6" />
                 </svg>
               </button>
               <span style={css("width: 120px; height: 3px; background: rgba(255,255,255,0.3); position: relative; border-radius: 2px")}>
-                <span style={css(`position: absolute; left: 0; top: 0; height: 3px; width: 30px; background: ${v.primary ?? ""}; border-radius: 2px`)} />
+                <span style={css(`position: absolute; left: 0; top: 0; height: 3px; width: ${v.slideBar ?? ""}; background: ${v.primary ?? ""}; border-radius: 2px; transition: width .4s ease`)} />
               </span>
             </div>
           </div>

@@ -35,7 +35,15 @@ const PAGES = {
 };
 
 // 외부 서비스 없이 돌리는 체험용 동작 (디자인 파일은 그대로 두고 여기서만 바꿔요)
+// 디자인 HTML 자체를 바꾸는 패치 (홈 슬라이더를 실제로 동작하게)
+const TEMPLATE_PATCHES = {
+  'Main.dc.html': [["<img src=\"/_blob/c03a3e2bcf9d8de53ca200225920f242\" alt=\"예수원교회 청년부 단체 사진\" style=\"position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%\">", "<sc-for list=\"{{slides}}\" as=\"s\"><img src=\"{{s.src}}\" alt=\"{{s.alt}}\" aria-hidden=\"{{s.hidden}}\" style=\"position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; transition: opacity .9s ease; opacity: {{s.opacity}}\"></sc-for>"], ["<button aria-label=\"이전 사진\" style=\"", "<button aria-label=\"이전 사진\" onClick=\"{{prevSlide}}\" style=\""], ["<button aria-label=\"다음 사진\" style=\"", "<button aria-label=\"다음 사진\" onClick=\"{{nextSlide}}\" style=\""], ["<b>01</b> <span style=\"opacity: 0.7\">/ 04</span>", "<b>{{slideNo}}</b> <span style=\"opacity: 0.7\">/ {{slideTotal}}</span>"], ["height: 3px; width: 30px; background: {{primary}}; border-radius: 2px", "height: 3px; width: {{slideBar}}; background: {{primary}}; border-radius: 2px; transition: width .4s ease"]],
+  'MemberMain.dc.html': [["<img src=\"/_blob/c03a3e2bcf9d8de53ca200225920f242\" alt=\"예수원교회 청년부 단체 사진\" style=\"position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%\">", "<sc-for list=\"{{slides}}\" as=\"s\"><img src=\"{{s.src}}\" alt=\"{{s.alt}}\" aria-hidden=\"{{s.hidden}}\" style=\"position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center 60%; transition: opacity .9s ease; opacity: {{s.opacity}}\"></sc-for>"], ["<button aria-label=\"이전 사진\" style=\"", "<button aria-label=\"이전 사진\" onClick=\"{{prevSlide}}\" style=\""], ["<button aria-label=\"다음 사진\" style=\"", "<button aria-label=\"다음 사진\" onClick=\"{{nextSlide}}\" style=\""], ["<b>01</b> <span style=\"opacity: 0.7\">/ 04</span>", "<b>{{slideNo}}</b> <span style=\"opacity: 0.7\">/ {{slideTotal}}</span>"], ["height: 3px; width: 30px; background: {{primary}}; border-radius: 2px", "height: 3px; width: {{slideBar}}; background: {{primary}}; border-radius: 2px; transition: width .4s ease"]],
+};
+
 const PATCHES = {
+  'Main.dc.html': [["    return {\n      primary: this.props.primary ?? '#8BC34A',", "    // 홈 슬라이더: 구글 드라이브 current_banner 폴더 사진 (lib/banners.js)\n    const total = BANNERS.length;\n    const cur = ((this.state && this.state.slide) || 0) % total;\n    const go = (d) => this.setState({ slide: (cur + d + total) % total });\n    if (typeof window !== 'undefined' && total > 1 && !this._timer) {\n      this._timer = setInterval(() => this.setState((s) => ({ slide: ((s.slide || 0) + 1) % total })), 6000);\n    }\n    const pad = (n) => String(n).padStart(2, '0');\n    const slideVals = {\n      slides: BANNERS.map((b, i) => ({ src: b.src, alt: b.alt, opacity: i === cur ? '1' : '0', hidden: i === cur ? 'false' : 'true' })),\n      prevSlide: () => go(-1), nextSlide: () => go(1),\n      slideNo: pad(cur + 1), slideTotal: pad(total), slideBar: Math.round(((cur + 1) / total) * 120) + 'px',\n    };\n    return {\n      ...slideVals,\n      primary: this.props.primary ?? '#8BC34A',"]],
+  'MemberMain.dc.html': [["    return {\n      primary: this.props.primary ?? '#8BC34A',", "    // 홈 슬라이더: 구글 드라이브 current_banner 폴더 사진 (lib/banners.js)\n    const total = BANNERS.length;\n    const cur = ((this.state && this.state.slide) || 0) % total;\n    const go = (d) => this.setState({ slide: (cur + d + total) % total });\n    if (typeof window !== 'undefined' && total > 1 && !this._timer) {\n      this._timer = setInterval(() => this.setState((s) => ({ slide: ((s.slide || 0) + 1) % total })), 6000);\n    }\n    const pad = (n) => String(n).padStart(2, '0');\n    const slideVals = {\n      slides: BANNERS.map((b, i) => ({ src: b.src, alt: b.alt, opacity: i === cur ? '1' : '0', hidden: i === cur ? 'false' : 'true' })),\n      prevSlide: () => go(-1), nextSlide: () => go(1),\n      slideNo: pad(cur + 1), slideTotal: pad(total), slideBar: Math.round(((cur + 1) / total) * 120) + 'px',\n    };\n    return {\n      ...slideVals,\n      primary: this.props.primary ?? '#8BC34A',"]],
   'Login.dc.html': [[
     "else this.setState({ msg: '로그인 화면 미리보기예요. 실제 사이트에서는 서버에서 확인합니다.', ok: true });",
     "else { this.setState({ msg: '체험용 로그인이에요. 잠시 후 이동합니다.', ok: true }); setTimeout(() => { window.location.href = (process.env.NEXT_PUBLIC_BASE_PATH || '') + (uid.trim().toLowerCase() === 'admin' ? '/admin/' : '/member/'); }, 500); }",
@@ -155,7 +163,11 @@ function nodeJSX(node, scope, depth) {
 }
 
 function convert(file, out) {
-  const src = fs.readFileSync(path.join(DESIGN, file), 'utf8');
+  let src = fs.readFileSync(path.join(DESIGN, file), 'utf8');
+  for (const [from, to] of TEMPLATE_PATCHES[file] || []) {
+    if (!src.includes(from)) throw new Error(`템플릿 패치 위치를 못 찾음: ${file}: ${from.slice(0, 40)}`);
+    src = src.split(from).join(to);
+  }
   const xdc = src.slice(src.indexOf('<x-dc>') + 6, src.indexOf('</x-dc>'));
   const helmet = xdc.match(/<helmet>([\s\S]*?)<\/helmet>/);
   const styles = helmet ? [...helmet[1].matchAll(/<style>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join('\n') : '';
@@ -174,6 +186,7 @@ function convert(file, out) {
 // 화면을 고치려면 design 파일을 고친 뒤 \`npm run convert\` 를 다시 돌리세요.
 import React, { useEffect } from 'react';
 import { A, DCLogic, asset, css, useDC } from '@/lib/dc';
+import { BANNERS } from '@/lib/banners';
 
 const STYLE = ${JSON.stringify(styles)};
 

@@ -4,7 +4,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-  workflow_dispatch:
+  workflow_dispatch:       # Actions 탭에서 [Run workflow] 버튼으로 바로 실행
+  schedule:
+    - cron: '0 9 * * *'    # 매일 새벽 4시(동부 시간)쯤, 드라이브 새 사진 가져오기
 
 permissions:
   contents: read
@@ -25,6 +27,11 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      - name: Sync banners from Google Drive
+        run: npm run sync
+        continue-on-error: true   # 드라이브가 안 되어도 사이트 배포는 계속
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
       - name: Build
         run: npm run build
         env:

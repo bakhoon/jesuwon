@@ -30,6 +30,19 @@ http://localhost:3000 을 열면 돼요.
 
 주소: `https://<계정>.github.io/<저장소이름>/`
 
+## 홈 배너 사진 (구글 드라이브)
+
+홈 첫 화면 슬라이더는 구글 드라이브 `home/banner/current_banner` 폴더의 사진을 보여줘요.
+
+- **사진 바꾸기:** 폴더에 사진을 넣거나 빼면 돼요. 내린 배너는 `old_banner` 로 옮겨 두세요.
+- **순서:** 파일 이름 순서예요. `01_`, `02_` 처럼 앞에 숫자를 붙이면 원하는 순서가 돼요.
+- **설명 문구:** `01_탄자니아 선교.jpg` → 화면 읽기용 설명이 "탄자니아 선교"가 돼요.
+- **반영 시간:** 매일 새벽 한 번 자동으로 가져와요. 바로 반영하려면 GitHub 저장소 **Actions › Deploy to GitHub Pages › Run workflow** 를 누르세요 (3~5분).
+- **원본 그대로:** 큰 원본을 넣어도 자동으로 가로 1920px JPG로 줄여서 올려요.
+
+처음 한 번 설정: GitHub 저장소 **Settings › Secrets and variables › Actions** 에 `GOOGLE_API_KEY` 를 추가해야 해요.
+키가 없으면 동기화를 건너뛰고 기본 사진 한 장을 보여줘요.
+
 ## 폴더 구조
 
 ```
@@ -38,6 +51,8 @@ tools/convert-design.mjs  design → app 페이지로 바꿔주는 변환 스크
 app/**/page.js          실제 페이지 (변환 스크립트가 만든 파일)
 lib/dc.js               변환된 페이지가 쓰는 도우미 (주소 변환, 스타일, 상태 관리)
 lib/assets.js           이미지 목록
+lib/banners.js          홈 슬라이더 사진 목록 (data/banners.json 읽기)
+tools/sync-drive.mjs    구글 드라이브 → 배너 사진 동기화
 public/img/             사진 파일
 ```
 
