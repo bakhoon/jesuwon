@@ -265,7 +265,7 @@ export default function Page() {
         </section>
         <section id="welcome" className="quick-wrap" style={css("position: relative; margin-top: -72px; padding: 0 40px")}>
           <div className="quick-grid" style={css("max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px")}>
-            <A href="#" style={css("display: flex; gap: 16px; align-items: center; background: #FFFFFF; border-radius: 16px; padding: 24px; text-decoration: none; color: #1B2516; box-shadow: 0 10px 30px rgba(27,37,22,0.10)")}>
+            <A href="About.dc.html" style={css("display: flex; gap: 16px; align-items: center; background: #FFFFFF; border-radius: 16px; padding: 24px; text-decoration: none; color: #1B2516; box-shadow: 0 10px 30px rgba(27,37,22,0.10)")}>
               <span style={css("flex-shrink: 0; width: 52px; height: 52px; border-radius: 14px; background: #E6F2D6; color: #2F5E17; display: flex; align-items: center; justify-content: center")}>
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M12 2v5" />
